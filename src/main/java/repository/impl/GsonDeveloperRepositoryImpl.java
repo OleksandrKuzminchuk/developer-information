@@ -60,7 +60,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     public Developer update(Developer developer) {
         List<Developer> developers = findAll();
         Predicate<Developer> findDeveloper = dev -> dev.getId().equals(developer.getId());
-        Consumer<Developer> recordNewDates = dev -> {
+        Consumer<Developer> recordNewData = dev -> {
             if (developer.getFirstName() != null) {
                 dev.setFirstName(developer.getFirstName());
                 if (developer.getLastName() != null) {
@@ -68,7 +68,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
                 }
             }
         };
-        ParametrizeMethodsCrud.update(developer, developers, findDeveloper, recordNewDates);
+        ParametrizeMethodsCrud.update(developer, developers, findDeveloper, recordNewData);
         cleanFile(file);
         developers.forEach(this::save);
         return developer;

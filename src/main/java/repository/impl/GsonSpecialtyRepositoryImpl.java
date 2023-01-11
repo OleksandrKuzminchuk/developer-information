@@ -36,12 +36,12 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     @Override
     public Specialty update(Specialty specialty) {
         List<Specialty> specialties = findAll();
-        Predicate<Specialty> predicate = s -> s.getId().equals(specialty.getId());
-        Consumer<Specialty> consumer = s -> {
+        Predicate<Specialty> findSpecialty = s -> s.getId().equals(specialty.getId());
+        Consumer<Specialty> setName = s -> {
             if (specialty.getName() != null)
                 s.setName(specialty.getName());
         };
-        ParametrizeMethodsCrud.update(specialty, specialties, predicate, consumer);
+        ParametrizeMethodsCrud.update(specialty, specialties, findSpecialty, setName);
         cleanFile(file);
         specialties.forEach(this::save);
         return specialty;
@@ -50,9 +50,9 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     @Override
     public Specialty findById(Integer id) {
         List<Specialty> specialties = findAll();
-        Predicate<Specialty> predicate = specialty -> specialty.getId().equals(id)
+        Predicate<Specialty> findSpecialty = specialty -> specialty.getId().equals(id)
                 && specialty.getStatus().equals(Status.ACTIVE);
-        return ParametrizeMethodsCrud.findById(id, predicate, specialties, NOT_FOUND_SPECIALITY);
+        return ParametrizeMethodsCrud.findById(id, findSpecialty, specialties, NOT_FOUND_SPECIALITY);
     }
 
     @Override
@@ -73,10 +73,10 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     @Override
     public void deleteById(Integer id) {
         List<Specialty> specialties = findAll();
-        Predicate<Specialty> predicate = specialty -> specialty.getId().equals(id)
+        Predicate<Specialty> findSpecialty = specialty -> specialty.getId().equals(id)
                 && specialty.getStatus().equals(Status.ACTIVE);
-        Consumer<Specialty> consumer = specialty -> specialty.setStatus(Status.DELETED);
-        ParametrizeMethodsCrud.deleteById(id, specialties, predicate, consumer);
+        Consumer<Specialty> setStatusDeleted = specialty -> specialty.setStatus(Status.DELETED);
+        ParametrizeMethodsCrud.deleteById(id, specialties, findSpecialty, setStatusDeleted);
         cleanFile(file);
         specialties.forEach(this::save);
     }
@@ -89,11 +89,11 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     @Override
     public void deleteAll() {
         List<Specialty> specialties = findAll();
-        Consumer<Specialty> consumer = specialty -> {
+        Consumer<Specialty> setStatusDeleted = specialty -> {
             if (specialty.getStatus() == Status.ACTIVE)
                 specialty.setStatus(Status.DELETED);
         };
-        ParametrizeMethodsCrud.deleteAll(specialties, consumer);
+        ParametrizeMethodsCrud.deleteAll(specialties, setStatusDeleted);
         cleanFile(file);
         specialties.forEach(this::save);
     }

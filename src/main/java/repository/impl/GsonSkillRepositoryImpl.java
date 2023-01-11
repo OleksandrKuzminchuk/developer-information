@@ -37,20 +37,20 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
     @Override
     public Skill findById(Integer id) {
         List<Skill> skills = findAll();
-        Predicate<Skill> predicate = skill -> skill.getId().equals(id)
+        Predicate<Skill> findSkill = skill -> skill.getId().equals(id)
                 && skill.getStatus().equals(Status.ACTIVE);
-        return ParametrizeMethodsCrud.findById(id, predicate, skills, NOT_FOUND_SKILL);
+        return ParametrizeMethodsCrud.findById(id, findSkill, skills, NOT_FOUND_SKILL);
     }
 
     @Override
     public Skill update(Skill skill) {
         List<Skill> skills = findAll();
-        Predicate<Skill> predicate = s -> s.getId().equals(skill.getId());
-        Consumer<Skill> consumer = s -> {
+        Predicate<Skill> findSkill = s -> s.getId().equals(skill.getId());
+        Consumer<Skill> setName = s -> {
             if (skill.getName() != null)
                 s.setName(skill.getName());
         };
-        ParametrizeMethodsCrud.update(skill, skills, predicate, consumer);
+        ParametrizeMethodsCrud.update(skill, skills, findSkill, setName);
         cleanFile(file);
         skills.forEach(this::save);
         return skill;
@@ -74,9 +74,9 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
     @Override
     public void deleteById(Integer id) {
         List<Skill> skills = findAll();
-        Predicate<Skill> predicate = skill -> skill.getId().equals(id) && skill.getStatus().equals(Status.ACTIVE);
-        Consumer<Skill> consumer = skill -> skill.setStatus(Status.DELETED);
-        ParametrizeMethodsCrud.deleteById(id, skills, predicate, consumer);
+        Predicate<Skill> findSkill = skill -> skill.getId().equals(id) && skill.getStatus().equals(Status.ACTIVE);
+        Consumer<Skill> setStatusDeleted = skill -> skill.setStatus(Status.DELETED);
+        ParametrizeMethodsCrud.deleteById(id, skills, findSkill, setStatusDeleted);
         cleanFile(file);
         skills.forEach(this::save);
      }
@@ -89,11 +89,11 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
     @Override
     public void deleteAll() {
         List<Skill> skills = findAll();
-        Consumer<Skill> consumer = skill -> {
+        Consumer<Skill> setStatusDeleted = skill -> {
             if (skill.getStatus() == Status.ACTIVE)
                 skill.setStatus(Status.DELETED);
         };
-        ParametrizeMethodsCrud.deleteAll(skills, consumer);
+        ParametrizeMethodsCrud.deleteAll(skills, setStatusDeleted);
         cleanFile(file);
         skills.forEach(this::save);
      }

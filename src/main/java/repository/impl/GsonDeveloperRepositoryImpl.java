@@ -41,9 +41,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public Developer findById(Integer id) {
         List<Developer> developers = findAll();
-        Predicate<Developer> predicate = dev -> dev.getId().equals(id)
+        Predicate<Developer> findDeveloper = dev -> dev.getId().equals(id)
                 && dev.getStatus().equals(Status.ACTIVE);
-        return ParametrizeMethodsCrud.findById(id, predicate, developers, NOT_FOUND_DEVELOPER);
+        return ParametrizeMethodsCrud.findById(id, findDeveloper, developers, NOT_FOUND_DEVELOPER);
     }
 
     @Override
@@ -59,8 +59,8 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public Developer update(Developer developer) {
         List<Developer> developers = findAll();
-        Predicate<Developer> predicate = dev -> dev.getId().equals(developer.getId());
-        Consumer<Developer> consumer = dev -> {
+        Predicate<Developer> findDeveloper = dev -> dev.getId().equals(developer.getId());
+        Consumer<Developer> recordNewDates = dev -> {
             if (developer.getFirstName() != null) {
                 dev.setFirstName(developer.getFirstName());
                 if (developer.getLastName() != null) {
@@ -68,7 +68,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
                 }
             }
         };
-        ParametrizeMethodsCrud.update(developer, developers, predicate, consumer);
+        ParametrizeMethodsCrud.update(developer, developers, findDeveloper, recordNewDates);
         cleanFile(file);
         developers.forEach(this::save);
         return developer;
@@ -82,9 +82,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public void deleteById(Integer id) {
         List<Developer> developers = findAll();
-        Predicate<Developer> predicate = dev -> dev.getId().equals(id) && dev.getStatus().equals(Status.ACTIVE);
-        Consumer<Developer> consumer = dev -> dev.setStatus(Status.DELETED);
-        ParametrizeMethodsCrud.deleteById(id, developers, predicate, consumer);
+        Predicate<Developer> findDeveloper = dev -> dev.getId().equals(id) && dev.getStatus().equals(Status.ACTIVE);
+        Consumer<Developer> setStatusDeleted = dev -> dev.setStatus(Status.DELETED);
+        ParametrizeMethodsCrud.deleteById(id, developers, findDeveloper, setStatusDeleted);
         cleanFile(file);
         developers.forEach(this::save);
     }
@@ -97,11 +97,11 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public void deleteAll() {
         List<Developer> developers = findAll();
-        Consumer<Developer> consumer = dev -> {
+        Consumer<Developer> setStatusDeleted = dev -> {
             if (dev.getStatus() == Status.ACTIVE)
                 dev.setStatus(Status.DELETED);
         };
-        ParametrizeMethodsCrud.deleteAll(developers, consumer);
+        ParametrizeMethodsCrud.deleteAll(developers, setStatusDeleted);
         cleanFile(file);
         developers.forEach(this::save);
     }

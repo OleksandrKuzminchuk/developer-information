@@ -41,7 +41,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
             if (specialty.getName() != null)
                 s.setName(specialty.getName());
         };
-        ParametrizeMethodsCrud.update(specialty, specialties, findSpecialty, setName);
+        ParametrizeMethodsCrud.update(specialties, findSpecialty, setName);
         cleanFile(file);
         specialties.forEach(this::save);
         return specialty;
@@ -52,7 +52,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
         List<Specialty> specialties = findAll();
         Predicate<Specialty> findSpecialty = specialty -> specialty.getId().equals(id)
                 && specialty.getStatus().equals(Status.ACTIVE);
-        return ParametrizeMethodsCrud.findById(id, findSpecialty, specialties, NOT_FOUND_SPECIALITY);
+        return ParametrizeMethodsCrud.findById(findSpecialty, specialties, NOT_FOUND_SPECIALITY);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
         Predicate<Specialty> findSpecialty = specialty -> specialty.getId().equals(id)
                 && specialty.getStatus().equals(Status.ACTIVE);
         Consumer<Specialty> setStatusDeleted = specialty -> specialty.setStatus(Status.DELETED);
-        ParametrizeMethodsCrud.deleteById(id, specialties, findSpecialty, setStatusDeleted);
+        ParametrizeMethodsCrud.deleteById(specialties, findSpecialty, setStatusDeleted);
         cleanFile(file);
         specialties.forEach(this::save);
     }

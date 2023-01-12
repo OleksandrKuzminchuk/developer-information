@@ -1,6 +1,5 @@
 package controller;
 
-import exception.NotValidException;
 import model.Developer;
 import model.Skill;
 import model.Specialty;
@@ -29,15 +28,13 @@ public class DeveloperController {
         this.file = new File(FILE_DEVELOPERS_PATH);
     }
 
-    public Developer save(Developer developer) throws IllegalArgumentException {
-        requireNonNull(developer);
+    public Developer save(Developer developer) {
         isExistsDeveloperIntoFileById(developer.getId());
         assignStatusActiveIfNull(developer);
         return repository.save(developer);
     }
 
     public Developer findById(Integer id) {
-        requireNonNull(id);
         return repository.findById(id);
     }
 
@@ -46,13 +43,11 @@ public class DeveloperController {
     }
 
     public Developer update(Developer developer) {
-        requireNonNull(developer);
         repository.existsById(developer.getId());
         return repository.update(developer);
     }
 
     public String deleteById(Integer id) {
-        requireNonNull(id);
         repository.existsById(id);
         repository.deleteById(id);
         return RESPONSE_OK;
@@ -63,32 +58,26 @@ public class DeveloperController {
         return RESPONSE_OK;
     }
 
-    public Skill addSkill(Integer developerId, Integer skillId) throws NotValidException {
-        requireNonNull(skillId);
-        requireNonNull(developerId);
+    public Skill addSkill(Integer developerId, Integer skillId) {
         repository.existsById(developerId);
         Skill skill = skillRepository.findById(skillId);
         return repository.addSkill(developerId, skill);
     }
 
-    public String deleteSkill(Integer developerId, Integer skillId) throws NotValidException {
-        requireNonNull(developerId);
-        requireNonNull(skillId);
+    public String deleteSkill(Integer developerId, Integer skillId) {
         repository.existsById(developerId);
         skillRepository.existsById(skillId);
         repository.deleteSkill(developerId, skillId);
         return RESPONSE_OK;
     }
 
-    public Specialty addSpecialty(Integer developerId, Integer specialityId) throws NotValidException {
-        requireNonNull(developerId);
-        requireNonNull(specialityId);
+    public Specialty addSpecialty(Integer developerId, Integer specialityId) {
         repository.existsById(developerId);
         Specialty specialty = specialtyRepository.findById(specialityId);
         return repository.addSpecialty(developerId, specialty);
     }
 
-    public String deleteSpecialty(Integer developerId, Integer specialityId) throws NotValidException {
+    public String deleteSpecialty(Integer developerId, Integer specialityId) {
         requireNonNull(developerId);
         requireNonNull(specialityId);
         repository.existsById(developerId);
@@ -106,7 +95,7 @@ public class DeveloperController {
             List<Developer> developers = findAll();
             if (developers.stream().anyMatch(developer -> developer.getId().equals(id)
                     && developer.getStatus().equals(Status.ACTIVE))) {
-                throw new IllegalArgumentException(format("Developer has already taken by id - %d", id));
+                throw new IllegalArgumentException(format(EXCEPTION_DEVELOPER_HAS_ALREADY_TAKEN, id));
             } else if (developers.stream().anyMatch(developer -> developer.getId().equals(id)
                     && developer.getStatus().equals(Status.DELETED))) {
                 throw new IllegalArgumentException(NOT_FOUND_DEVELOPER);

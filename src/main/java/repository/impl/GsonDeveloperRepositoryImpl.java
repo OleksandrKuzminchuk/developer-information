@@ -2,6 +2,7 @@ package repository.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import exception.NotFoundException;
 import exception.NotValidException;
 import model.Developer;
 import model.Skill;
@@ -17,7 +18,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static java.util.Objects.requireNonNull;
 import static repository.ParametrizeMethodsCrud.cleanFile;
 import static util.Constants.*;
 
@@ -43,7 +43,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
         List<Developer> developers = findAll();
         Predicate<Developer> findDeveloper = dev -> dev.getId().equals(id)
                 && dev.getStatus().equals(Status.ACTIVE);
-        return ParametrizeMethodsCrud.findById(id, findDeveloper, developers, NOT_FOUND_DEVELOPER);
+        return ParametrizeMethodsCrud.findById(findDeveloper, developers, NOT_FOUND_DEVELOPER);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
                 }
             }
         };
-        ParametrizeMethodsCrud.update(developer, developers, findDeveloper, recordNewData);
+        ParametrizeMethodsCrud.update(developers, findDeveloper, recordNewData);
         cleanFile(file);
         developers.forEach(this::save);
         return developer;
@@ -84,7 +84,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
         List<Developer> developers = findAll();
         Predicate<Developer> findDeveloper = dev -> dev.getId().equals(id) && dev.getStatus().equals(Status.ACTIVE);
         Consumer<Developer> setStatusDeleted = dev -> dev.setStatus(Status.DELETED);
-        ParametrizeMethodsCrud.deleteById(id, developers, findDeveloper, setStatusDeleted);
+        ParametrizeMethodsCrud.deleteById(developers, findDeveloper, setStatusDeleted);
         cleanFile(file);
         developers.forEach(this::save);
     }
@@ -107,7 +107,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public Skill addSkill(Integer developerId, Skill skill) throws NotValidException {
+    public Skill addSkill(Integer developerId, Skill skill) {
         List<Developer> developers = findAll();
         Predicate<Developer> isUniqueSkillInDeveloperList = developer -> {
             if (developer.getSkills().stream().anyMatch(s -> s.getId().equals(skill.getId())))
@@ -126,7 +126,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public void deleteSkill(Integer developerId, Integer skillId) throws NotValidException {
+    public void deleteSkill(Integer developerId, Integer skillId) {
         List<Developer> developers = findAll();
         Predicate<Developer> isThereUniqueSkillInDeveloperList = developer -> {
             if (developer.getSkills().stream().anyMatch(skill -> skill.getId().equals(skillId))){
@@ -144,10 +144,10 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public Specialty addSpecialty(Integer developerId, Specialty specialty) throws NotValidException {
+    public Specialty addSpecialty(Integer developerId, Specialty specialty) {
         List<Developer> developers = findAll();
         Predicate<Developer> isUniqueSpecialityInDeveloper = developer -> {
-          if (developer.getSpecialty().getId().equals(specialty.getId()))
+          if (developer.getSpecialty() != null && developer.getSpecialty().getId().equals(specialty.getId()))
               throw new NotValidException(DEVELOPER_HAS_SPECIALITY);
           return true;
         };
@@ -163,9 +163,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public void deleteSpecialty(Integer developerId, Integer specialityId) throws NotValidException {
+    public void deleteSpecialty(Integer developerId, Integer specialityId) {
         List<Developer> developers = findAll();
-        Consumer<Developer> deleteSpeciality = dev -> dev.setSpecialty(new Specialty(TWO_BILLION));
+        Consumer<Developer> deleteSpeciality = dev -> dev.setSpecialty(null);
         Runnable exception = () -> {throw new NotValidException(DEVELOPER_HAS_NOT_SPECIALITY);};
         Predicate<Developer> findDeveloper = dev -> dev.getId().equals(developerId) && dev.getSpecialty().getId().equals(specialityId);
         developers.stream().filter(findDeveloper).findFirst().ifPresentOrElse(deleteSpeciality, exception);
@@ -175,8 +175,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     @Override
     public List<Skill> findSkillsByDeveloperId(Integer id) {
-        requireNonNull(id);
         Developer developer = findById(id);
+        if (developer.getSkills().isEmpty())
+            throw new NotFoundException(EMPTY_LIST);
         return developer.getSkills();
     }
 }

@@ -8,6 +8,7 @@ import model.Skill;
 import model.Specialty;
 
 import java.util.Comparator;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import static util.Constants.*;
@@ -32,8 +33,8 @@ public class DeveloperView {
             scanner.reset();
         }catch (IllegalArgumentException e){
             System.out.println(e.getMessage());
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
         }
     }
     public void findById(Scanner scanner){
@@ -45,8 +46,8 @@ public class DeveloperView {
             System.out.println(foundDeveloper);
         }catch (NotFoundException e){
             System.out.println(e.getMessage());
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
         }
     }
     public void findAll(){
@@ -67,8 +68,10 @@ public class DeveloperView {
             Developer updated = controller.update(new Developer(id, newFirstName, newLastName));
             System.out.println(updated + TEXT_UPDATED_SUCCESSFULLY);
             scanner.reset();
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (NotFoundException e){
+            System.out.println(e.getMessage());
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
         }
     }
     public void deleteById(Scanner scanner){
@@ -78,8 +81,10 @@ public class DeveloperView {
             scanner.nextLine();
             String deleted = controller.deleteById(id);
             System.out.println(deleted);
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
+        }catch (NotFoundException e){
+            System.out.println(e.getMessage());
         }
     }
     public void deleteAll(){
@@ -96,10 +101,10 @@ public class DeveloperView {
             scanner.nextLine();
             Skill skill = controller.addSkill(developerId, skillId);
             System.out.println(skill + TEXT_ADDED_SUCCESSFULLY);
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
-        }catch (NotValidException e){
+        }catch (NotFoundException | NotValidException e){
             System.out.println(e.getMessage());
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
         }
     }
     public void deleteSkill(Scanner scanner){
@@ -112,10 +117,10 @@ public class DeveloperView {
             scanner.nextLine();
             String deleted = controller.deleteSkill(developerId, skillId);
             System.out.println(deleted);
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
-        }catch (NotValidException e){
+        }catch (NotValidException | NotFoundException e){
             System.out.println(e.getMessage());
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
         }
     }
     public void addSpeciality(Scanner scanner){
@@ -128,10 +133,10 @@ public class DeveloperView {
             scanner.nextLine();
             Specialty specialty = controller.addSpecialty(developerId, specialityId);
             System.out.println(specialty + TEXT_ADDED_SUCCESSFULLY);
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
-        }catch (NotValidException e){
+        }catch (NotValidException | NotFoundException e){
             System.out.println(e.getMessage());
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
         }
     }
     public void deleteSpecialty(Scanner scanner){
@@ -144,9 +149,9 @@ public class DeveloperView {
             scanner.nextLine();
             String deleted = controller.deleteSpecialty(developerId, specialityId);
             System.out.println(deleted);
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
-        }catch (NotValidException e){
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
+        }catch (NotValidException | NotFoundException e){
             System.out.println(e.getMessage());
         }
     }
@@ -159,8 +164,10 @@ public class DeveloperView {
             controller.findSkillsByDeveloperId(id).stream()
                     .sorted(sortById)
                     .forEach(skill -> System.out.print(skill + "\n"));
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
+        }catch (NotFoundException e){
+            System.out.println(e.getMessage());
         }
     }
 }

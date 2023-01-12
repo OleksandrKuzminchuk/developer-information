@@ -39,7 +39,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
         List<Skill> skills = findAll();
         Predicate<Skill> findSkill = skill -> skill.getId().equals(id)
                 && skill.getStatus().equals(Status.ACTIVE);
-        return ParametrizeMethodsCrud.findById(id, findSkill, skills, NOT_FOUND_SKILL);
+        return ParametrizeMethodsCrud.findById(findSkill, skills, NOT_FOUND_SKILL);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
             if (skill.getName() != null)
                 s.setName(skill.getName());
         };
-        ParametrizeMethodsCrud.update(skill, skills, findSkill, setName);
+        ParametrizeMethodsCrud.update(skills, findSkill, setName);
         cleanFile(file);
         skills.forEach(this::save);
         return skill;
@@ -76,7 +76,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
         List<Skill> skills = findAll();
         Predicate<Skill> findSkill = skill -> skill.getId().equals(id) && skill.getStatus().equals(Status.ACTIVE);
         Consumer<Skill> setStatusDeleted = skill -> skill.setStatus(Status.DELETED);
-        ParametrizeMethodsCrud.deleteById(id, skills, findSkill, setStatusDeleted);
+        ParametrizeMethodsCrud.deleteById(skills, findSkill, setStatusDeleted);
         cleanFile(file);
         skills.forEach(this::save);
      }

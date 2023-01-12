@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 import static repository.ParametrizeMethodsCrud.cleanFile;
 import static util.Constants.*;
 
@@ -26,40 +25,56 @@ public class SkillController {
         this.developerRepository = developerRepository;
         this.file = new File(FILE_SKILLS_PATH);
     }
-    public Skill save(Skill skill) throws IllegalArgumentException {
-        requireNonNull(skill);
+
+    public Skill save(Skill skill) {
         isExistsSkillIntoFileById(skill.getId());
         assignStatusActiveIfNull(skill);
         return repository.save(skill);
     }
-    public Skill findById(Integer id){
-        requireNonNull(id);
+
+    public Skill findById(Integer id) {
         return repository.findById(id);
     }
-    public Skill update(Skill skill){
-        requireNonNull(skill);
+
+    public Skill update(Skill skill) {
         repository.existsById(skill.getId());
         return repository.update(skill);
     }
-    public List<Skill> findAll(){
+
+    public List<Skill> findAll() {
         return repository.findAll();
     }
-    public String deleteById(Integer id){
-        requireNonNull(id);
+
+    public String deleteById(Integer id) {
         repository.existsById(id);
         repository.deleteById(id);
         List<Developer> developers = developerRepository.findAll();
-        Predicate<Skill> removeIf = s -> s.getId().equals(id);
-        Consumer<Developer> removeSkillById = dev -> dev.getSkills().removeIf(removeIf);
-        developers.forEach(removeSkillById);
+        Predicate<Skill> setStatusDeleteIf = s -> s.getId().equals(id);
+        Consumer<Skill> setStatusDelete = skill -> {
+            if (skill.getId().equals(id))
+                skill.setStatus(Status.DELETED);
+        };
+        Consumer<Developer> setSkillStatusDeleteById = dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE))
+                dev.getSkills().removeIf(setStatusDeleteIf);
+            dev.getSkills().forEach(setStatusDelete);
+        };
+        developers.forEach(setSkillStatusDeleteById);
         cleanFile(new File(FILE_DEVELOPERS_PATH));
         developers.forEach(developerRepository::save);
         return RESPONSE_OK;
     }
-    public String deleteAll(){
+
+    public String deleteAll() {
         repository.deleteAll();
         List<Developer> developers = developerRepository.findAll();
-        developers.forEach(developer -> developer.getSkills().removeAll(developer.getSkills()));
+        Consumer<Skill> setStatusDelete = skill -> skill.setStatus(Status.DELETED);
+        Consumer<Developer> setSkillStatusDeleteById = dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE))
+                dev.getSkills().removeAll(dev.getSkills());
+            dev.getSkills().forEach(setStatusDelete);
+        };
+        developers.forEach(setSkillStatusDeleteById);
         cleanFile(new File(FILE_DEVELOPERS_PATH));
         developers.forEach(developerRepository::save);
         return RESPONSE_OK;
@@ -69,7 +84,7 @@ public class SkillController {
             List<Skill> skills = findAll();
             if (skills.stream().anyMatch(skill -> skill.getId().equals(id)
                     && skill.getStatus().equals(Status.ACTIVE))) {
-                throw new IllegalArgumentException(format("Skill has already taken by id - %d", id));
+                throw new IllegalArgumentException(format(EXCEPTION_SKILL_HAS_ALREADY_TAKEN, id));
             } else if (skills.stream().anyMatch(developer -> developer.getStatus().equals(Status.DELETED)
                     && developer.getId().equals(id))) {
                 throw new IllegalArgumentException(NOT_FOUND_SKILL);

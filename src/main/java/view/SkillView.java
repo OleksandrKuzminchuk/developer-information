@@ -1,9 +1,11 @@
 package view;
 
 import controller.SkillController;
+import exception.NotFoundException;
 import model.Skill;
 
 import java.util.Comparator;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import static util.Constants.*;
@@ -24,8 +26,8 @@ public class SkillView {
             Skill saved = controller.save(new Skill(id, name));
             System.out.println(saved + TEXT_SAVE_SUCCESSFULLY);
             scanner.reset();
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
         }catch (IllegalArgumentException e){
             System.out.println(e.getMessage());
         }
@@ -37,8 +39,10 @@ public class SkillView {
             scanner.nextLine();
             Skill skill = controller.findById(id);
             System.out.println(skill);
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
+        }catch (NotFoundException e){
+            System.out.println(e.getMessage());
         }
     }
     public void update(Scanner scanner){
@@ -51,8 +55,10 @@ public class SkillView {
             Skill updated = controller.update(new Skill(id, newName));
             System.out.println(updated + TEXT_UPDATED_SUCCESSFULLY);
             scanner.reset();
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
+        }catch (NotFoundException e){
+            System.out.println(e.getMessage());
         }
     }
     public void findAll(){
@@ -68,8 +74,10 @@ public class SkillView {
             scanner.nextLine();
             String deleted = controller.deleteById(id);
             System.out.println(deleted);
-        }catch (NullPointerException e){
-            System.out.println(NOT_NULL + e);
+        }catch (InputMismatchException e){
+            System.out.println(EXCEPTION_MISMATCH);
+        }catch (NotFoundException e){
+            System.out.println(e.getMessage());
         }
     }
     public void deleteAll(){

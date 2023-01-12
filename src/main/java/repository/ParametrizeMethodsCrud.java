@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 import static util.Constants.ERROR_IO;
 import static util.Constants.NOT_NULL;
 
-public interface ParametrizeMethodsCrud<T> {
+public interface ParametrizeMethodsCrud {
     static <T> void save(T t, List<T> list, File file, Gson gson, Type type) {
         try (FileOutputStream output = new FileOutputStream(file)) {
             StringBuilder builder = new StringBuilder();
@@ -57,23 +57,16 @@ public interface ParametrizeMethodsCrud<T> {
         return new ArrayList<>();
     }
 
-    static <T> T findById(Integer integer, Predicate<T> predicate, List<T> list, String exception) throws NotFoundException {
-        try {
-            if (!list.isEmpty()) {
-                return list.stream().filter(predicate).findFirst()
-                        .orElseThrow(() -> new NotFoundException(exception));
-            }
-        } catch (NotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-        throw new NotFoundException("File is empty");
+    static <T> T findById(Predicate<T> predicate, List<T> list, String exception) throws NotFoundException {
+        return list.stream().filter(predicate).findFirst()
+                .orElseThrow(() -> new NotFoundException(exception));
     }
 
-    static <T> void update(T t, List<T> list, Predicate<T> predicate, Consumer<T> consumer) {
+    static <T> void update(List<T> list, Predicate<T> predicate, Consumer<T> consumer) {
         list.stream().filter(predicate).forEach(consumer);
     }
 
-    static <T> void deleteById(Integer integer, List<T> list, Predicate<T> predicate, Consumer<T> consumer) {
+    static <T> void deleteById(List<T> list, Predicate<T> predicate, Consumer<T> consumer) {
         list.stream().filter(predicate).forEach(consumer);
     }
 

@@ -1,8 +1,9 @@
 package util;
 
-import static java.lang.String.format;
-
-public final class Constants {
+public class Constants {
+    private Constants() {
+        throw new IllegalStateException("Utility class");
+    }
     public static final String FILE_DEVELOPERS_PATH = "C:\\Users\\Kuzminchuk_Alexandr\\IdeaProjects\\developer-information\\src\\main\\resources\\db\\developers.json";
     public static final String FILE_SKILLS_PATH = "C:\\Users\\Kuzminchuk_Alexandr\\IdeaProjects\\developer-information\\src\\main\\resources\\db\\skills.json";
     public static final String FILE_SPECIALTIES_PATH = "C:\\Users\\Kuzminchuk_Alexandr\\IdeaProjects\\developer-information\\src\\main\\resources\\db\\specialties.json";
@@ -16,8 +17,10 @@ public final class Constants {
     public static final String DEVELOPER_HAS_SPECIALITY = "The developer already has the speciality";
     public static final String DEVELOPER_HAS_NOT_SPECIALITY = "The developer has not the speciality";
     public static final String RESPONSE_OK = "SUCCESSFULLY";
-    public static final Integer TWO_BILLION = 2_000_000_000;
     public static final String ERROR_IO = "Error input-output or Parse Json: ";
+    public static final String EXCEPTION_DEVELOPER_HAS_ALREADY_TAKEN = "Developer has already taken by id - %d";
+    public static final String EXCEPTION_SKILL_HAS_ALREADY_TAKEN = "Skill has already taken by id - %d";
+    public static final String EXCEPTION_SPECIALTY_HAS_ALREADY_TAKEN = "Speciality has already taken by id - %d";
     public static final String TEXT_INPUT_ID = "Please, input id";
     public static final String TEXT_INPUT_NAME = "Please, input name";
     public static final String TEXT_INPUT_NEW_NAME = "Please, input new name";
@@ -63,4 +66,6 @@ public final class Constants {
     public static final String SPECIALTIES_FIND_ALL = "specialties";
     public static final String SPECIALTIES_DELETE_BY_ID = "specialties/delete";
     public static final String SPECIALTIES_DELETE_ALL = "specialties/delete/all";
+    public static final String EXCEPTION_MISMATCH = "Id must be a number";
+    public static final String EMPTY_LIST = "List is empty";
 }

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static util.Constants.TWO_BILLION;
-
 public class Developer {
     private Integer id;
     private String firstName;
@@ -21,7 +19,6 @@ public class Developer {
         this.firstName = firstName;
         this.lastName = lastName;
         this.skills = new ArrayList<>();
-        this.specialty = new Specialty(TWO_BILLION);
     }
 
     public Integer getId() {

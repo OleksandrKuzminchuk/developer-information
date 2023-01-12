@@ -8,6 +8,8 @@ import repository.SpecialtyRepository;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -24,7 +26,7 @@ public class SpecialtyController {
         this.developerRepository = developerRepository;
         this.file = new File(FILE_SPECIALTIES_PATH);
     }
-    public Specialty save(Specialty specialty) throws IllegalArgumentException {
+    public Specialty save(Specialty specialty) {
         requireNonNull(specialty);
         isExistsSpecialityIntoFileById(specialty.getId());
         assignStatusActiveIfNull(specialty);
@@ -49,8 +51,8 @@ public class SpecialtyController {
         repository.existsById(id);
         repository.deleteById(id);
         List<Developer> developers = developerRepository.findAll();
-        developers.stream().filter(developer -> developer.getSpecialty().getId().equals(id))
-                .forEach(developer -> developer.setSpecialty(new Specialty(TWO_BILLION)));
+        Predicate<Developer> filterActiveAndHasSpecialty = dev -> dev.getSpecialty().getId().equals(id);
+        developers.stream().filter(filterActiveAndHasSpecialty).forEach(getConsumerSetSpecialtyStatusDelete());
         cleanFile(new File(FILE_DEVELOPERS_PATH));
         developers.forEach(developerRepository::save);
         return RESPONSE_OK;
@@ -58,7 +60,7 @@ public class SpecialtyController {
     public String deleteAll(){
         repository.deleteAll();
         List<Developer> developers = developerRepository.findAll();
-        developers.forEach(developer -> developer.setSpecialty(new Specialty(TWO_BILLION)));
+        developers.forEach(getConsumerSetSpecialtyStatusDelete());
         cleanFile(new File(FILE_DEVELOPERS_PATH));
         developers.forEach(developerRepository::save);
         return RESPONSE_OK;
@@ -68,7 +70,7 @@ public class SpecialtyController {
             List<Specialty> specialties = findAll();
             if (specialties.stream().anyMatch(specialty -> specialty.getId().equals(id)
                     && specialty.getStatus().equals(Status.ACTIVE))) {
-                throw new IllegalArgumentException(format("Speciality has already taken by id - %d", id));
+                throw new IllegalArgumentException(format(EXCEPTION_SPECIALTY_HAS_ALREADY_TAKEN, id));
             } else if (specialties.stream().anyMatch(specialty -> specialty.getStatus().equals(Status.DELETED)
                     && specialty.getId().equals(id))) {
                 throw new IllegalArgumentException(NOT_FOUND_SPECIALITY);
@@ -79,5 +81,12 @@ public class SpecialtyController {
         if (specialty.getStatus() == null) {
             specialty.setStatus(Status.ACTIVE);
         }
+    }
+    private Consumer<Developer> getConsumerSetSpecialtyStatusDelete() {
+        return dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE))
+                dev.setSpecialty(null);
+            dev.getSpecialty().setStatus(Status.DELETED);
+        };
     }
 }

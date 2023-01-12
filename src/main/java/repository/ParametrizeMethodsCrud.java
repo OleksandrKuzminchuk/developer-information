@@ -57,7 +57,7 @@ public interface ParametrizeMethodsCrud {
         return new ArrayList<>();
     }
 
-    static <T> T findById(Predicate<T> predicate, List<T> list, String exception) throws NotFoundException {
+    static <T> T findById(Predicate<T> predicate, List<T> list, String exception) {
         return list.stream().filter(predicate).findFirst()
                 .orElseThrow(() -> new NotFoundException(exception));
     }

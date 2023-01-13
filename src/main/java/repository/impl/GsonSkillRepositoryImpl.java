@@ -47,7 +47,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
         List<Skill> skills = findAll();
         Predicate<Skill> findSkill = s -> s.getId().equals(skill.getId());
         Consumer<Skill> setName = s -> {
-            if (skill.getName() != null && skill.getName().equals(s.getName()))
+            if (skill.getName() != null && !skill.getName().equals(s.getName()))
                 s.setName(skill.getName());
         };
         ParametrizeMethodsCrud.update(skills, findSkill, setName);

@@ -38,7 +38,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
         List<Specialty> specialties = findAll();
         Predicate<Specialty> findSpecialty = s -> s.getId().equals(specialty.getId());
         Consumer<Specialty> setName = s -> {
-            if (specialty.getName() != null && specialty.getName().equals(s.getName()))
+            if (specialty.getName() != null && !specialty.getName().equals(s.getName()))
                 s.setName(specialty.getName());
         };
         ParametrizeMethodsCrud.update(specialties, findSpecialty, setName);

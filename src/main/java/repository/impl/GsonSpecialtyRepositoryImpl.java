@@ -15,12 +15,10 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.String.format;
-import static repository.ParametrizeMethodsCrud.cleanFile;
 import static util.Constants.*;
 
 public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     private static final File FILE = new File(FILE_SPECIALTIES_PATH);
-    ;
     private static final Gson GSON = new Gson();
     private static final Type COLLECTION_TYPE = new TypeToken<List<Specialty>>() {
     }.getType();
@@ -39,10 +37,8 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
 
     @Override
     public Specialty update(Specialty specialty) {
-        List<Specialty> specialties = findAll();
-        ParametrizeMethodsCrud.update(specialties, getPredicateEqualsIdSpecialty(specialty.getId()), getConsumerUpdate(specialty));
-        cleanFile(FILE);
-        specialties.forEach(this::save);
+        ParametrizeMethodsCrud.update(getSpecialties(), getPredicateEqualsIdSpecialty(specialty.getId()),
+                getConsumerUpdate(specialty), FILE, GSON, COLLECTION_TYPE);
         return specialty;
     }
 
@@ -68,10 +64,8 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
 
     @Override
     public void deleteById(Integer id) {
-        List<Specialty> specialties = getSpecialties();
-        ParametrizeMethodsCrud.deleteById(specialties, getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDeleted());
-        cleanFile(FILE);
-        specialties.forEach(this::save);
+        ParametrizeMethodsCrud.deleteById(getSpecialties(), getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDeleted(),
+                FILE, GSON, COLLECTION_TYPE);
     }
 
     @Override
@@ -81,10 +75,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
 
     @Override
     public void deleteAll() {
-        List<Specialty> specialties = getSpecialties();
-        ParametrizeMethodsCrud.deleteAll(specialties, getConsumerSetStatusDeletedIfEqualsActive());
-        cleanFile(FILE);
-        specialties.forEach(this::save);
+        ParametrizeMethodsCrud.deleteAll(getSpecialties(), getConsumerSetStatusDeletedIfEqualsActive(), FILE, GSON, COLLECTION_TYPE);
     }
 
     private void isExistsSpecialityIntoFileById(Integer id) {

@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.String.format;
-import static repository.ParametrizeMethodsCrud.cleanFile;
 import static util.Constants.*;
 
 public class GsonSkillRepositoryImpl implements SkillRepository {
@@ -43,10 +42,8 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public Skill update(Skill skill) {
-        List<Skill> skills = getSkills();
-        ParametrizeMethodsCrud.update(skills, getPredicateEqualsId(skill.getId()), getConsumerSetName(skill));
-        cleanFile(FILE);
-        saveAll(skills);
+        ParametrizeMethodsCrud.update(getSkills(), getPredicateEqualsId(skill.getId()), getConsumerSetName(skill),
+                FILE, GSON, COLLECTION_TYPE);
         return skill;
     }
 
@@ -67,10 +64,8 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public void deleteById(Integer id) {
-        List<Skill> skills = getSkills();
-        ParametrizeMethodsCrud.deleteById(skills, getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDelete());
-        cleanFile(FILE);
-        saveAll(skills);
+        ParametrizeMethodsCrud.deleteById(getSkills(), getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDelete(),
+                FILE, GSON, COLLECTION_TYPE);
     }
 
     @Override
@@ -80,10 +75,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public void deleteAll() {
-        List<Skill> skills = getSkills();
-        ParametrizeMethodsCrud.deleteAll(skills, getConsumerSetStatusDeleteIfStatusActive());
-        cleanFile(FILE);
-        saveAll(skills);
+        ParametrizeMethodsCrud.deleteAll(getSkills(), getConsumerSetStatusDeleteIfStatusActive(), FILE, GSON, COLLECTION_TYPE);
     }
 
     private void isExistsSkillIntoFileById(Integer id) {

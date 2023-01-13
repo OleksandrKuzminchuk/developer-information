@@ -62,16 +62,26 @@ public interface ParametrizeMethodsCrud {
                 .orElseThrow(() -> new NotFoundException(exception));
     }
 
-    static <T> void update(List<T> list, Predicate<T> predicate, Consumer<T> consumer) {
+    static <T> void update(List<T> list, Predicate<T> predicate, Consumer<T> consumer, File file, Gson gson, Type type) {
         list.stream().filter(predicate).forEach(consumer);
+        cleanFile(file);
+        saveAll(list, file, gson, type);
     }
 
-    static <T> void deleteById(List<T> list, Predicate<T> predicate, Consumer<T> consumer) {
-        list.stream().filter(predicate).forEach(consumer);
+    static <T> void saveAll(List<T> list, File file, Gson gson, Type type){
+        list.forEach(t -> save(t, list, file, gson, type));
     }
 
-    static <T> void deleteAll(List<T> list, Consumer<T> consumer) {
+    static <T> void deleteById(List<T> list, Predicate<T> predicate, Consumer<T> consumer, File file, Gson gson, Type type) {
+        list.stream().filter(predicate).forEach(consumer);
+        cleanFile(file);
+        saveAll(list, file, gson, type);
+    }
+
+    static <T> void deleteAll(List<T> list, Consumer<T> consumer, File file, Gson gson, Type type) {
         list.forEach(consumer);
+        cleanFile(file);
+        saveAll(list, file, gson, type);
     }
 
     static void cleanFile(File file) {

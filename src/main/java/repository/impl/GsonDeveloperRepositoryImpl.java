@@ -61,9 +61,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
         List<Developer> developers = findAll();
         Predicate<Developer> findDeveloper = dev -> dev.getId().equals(developer.getId());
         Consumer<Developer> recordNewData = dev -> {
-            if (developer.getFirstName() != null) {
+            if (developer.getFirstName() != null && developer.getFirstName().equals(dev.getFirstName())) {
                 dev.setFirstName(developer.getFirstName());
-                if (developer.getLastName() != null) {
+                if (developer.getLastName() != null && developer.getLastName().equals(dev.getLastName())) {
                     dev.setLastName(developer.getLastName());
                 }
             }

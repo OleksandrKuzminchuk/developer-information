@@ -37,8 +37,10 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
 
     @Override
     public Specialty update(Specialty specialty) {
-        ParametrizeMethodsCrud.update(getSpecialties(), getPredicateEqualsIdSpecialty(specialty.getId()),
-                getConsumerUpdate(specialty), FILE, GSON, COLLECTION_TYPE);
+        List<Specialty> specialties = getSpecialties();
+        ParametrizeMethodsCrud.update(specialties, getPredicateEqualsIdSpecialty(specialty.getId()),
+                getConsumerUpdate(specialty), FILE);
+        saveAll(specialties);
         return specialty;
     }
 
@@ -64,8 +66,9 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
 
     @Override
     public void deleteById(Integer id) {
-        ParametrizeMethodsCrud.deleteById(getSpecialties(), getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDeleted(),
-                FILE, GSON, COLLECTION_TYPE);
+        List<Specialty> specialties = getSpecialties();
+        ParametrizeMethodsCrud.deleteById(specialties, getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDeleted(), FILE);
+        saveAll(specialties);
     }
 
     @Override
@@ -75,7 +78,9 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
 
     @Override
     public void deleteAll() {
-        ParametrizeMethodsCrud.deleteAll(getSpecialties(), getConsumerSetStatusDeletedIfEqualsActive(), FILE, GSON, COLLECTION_TYPE);
+        List<Specialty> specialties = getSpecialties();
+        ParametrizeMethodsCrud.deleteAll(specialties, getConsumerSetStatusDeletedIfEqualsActive(), FILE);
+        saveAll(specialties);
     }
 
     private void isExistsSpecialityIntoFileById(Integer id) {
@@ -96,7 +101,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     }
 
     private Predicate<Specialty> getPredicateEqualsIdSpecialty(Integer specialtyId) {
-        return specialty -> specialty.equals(specialtyId);
+        return specialty -> specialty.getId().equals(specialtyId);
     }
 
     private Consumer<Specialty> getConsumerUpdate(Specialty specialty) {

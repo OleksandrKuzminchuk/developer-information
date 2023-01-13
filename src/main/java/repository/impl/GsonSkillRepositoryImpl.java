@@ -42,8 +42,9 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public Skill update(Skill skill) {
-        ParametrizeMethodsCrud.update(getSkills(), getPredicateEqualsId(skill.getId()), getConsumerSetName(skill),
-                FILE, GSON, COLLECTION_TYPE);
+        List<Skill> skills = getSkills();
+        ParametrizeMethodsCrud.update(skills, getPredicateEqualsId(skill.getId()), getConsumerSetName(skill), FILE);
+        saveAll(skills);
         return skill;
     }
 
@@ -64,8 +65,9 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public void deleteById(Integer id) {
-        ParametrizeMethodsCrud.deleteById(getSkills(), getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDelete(),
-                FILE, GSON, COLLECTION_TYPE);
+        List<Skill> skills = getSkills();
+        ParametrizeMethodsCrud.deleteById(skills, getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDelete(), FILE);
+        saveAll(skills);
     }
 
     @Override
@@ -75,7 +77,9 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public void deleteAll() {
-        ParametrizeMethodsCrud.deleteAll(getSkills(), getConsumerSetStatusDeleteIfStatusActive(), FILE, GSON, COLLECTION_TYPE);
+        List<Skill> skills = getSkills();
+        ParametrizeMethodsCrud.deleteAll(skills, getConsumerSetStatusDeleteIfStatusActive(), FILE);
+        saveAll(skills);
     }
 
     private void isExistsSkillIntoFileById(Integer id) {

@@ -57,8 +57,10 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     @Override
     public Developer update(Developer developer) {
-        ParametrizeMethodsCrud.update(getDevelopers(), getPredicateEqualsIdDeveloper(developer.getId()),
-                getConsumerUpdate(developer), FILE, GSON, COLLECTION_TYPE);
+        List<Developer> developers = getDevelopers();
+        ParametrizeMethodsCrud.update(developers, getPredicateEqualsIdDeveloper(developer.getId()),
+                getConsumerUpdate(developer), FILE);
+        saveAll(developers);
         return developer;
     }
 
@@ -69,8 +71,10 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     @Override
     public void deleteById(Integer id) {
+        List<Developer> developers = getDevelopers();
         ParametrizeMethodsCrud.deleteById(getDevelopers(), getPredicateEqualsIdAndStatusActive(id),
-                getConsumerSetStatusDeleted(), FILE, GSON, COLLECTION_TYPE);
+                getConsumerSetStatusDeleted(), FILE);
+        saveAll(developers);
     }
 
     @Override
@@ -80,7 +84,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     @Override
     public void deleteAll() {
-        ParametrizeMethodsCrud.deleteAll(getDevelopers(), getConsumerSetAllStatusDeleted(), FILE, GSON, COLLECTION_TYPE);
+        List<Developer> developers = getDevelopers();
+        ParametrizeMethodsCrud.deleteAll(getDevelopers(), getConsumerSetAllStatusDeleted(), FILE);
+        saveAll(developers);
     }
 
     @Override

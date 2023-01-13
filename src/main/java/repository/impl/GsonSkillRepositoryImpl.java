@@ -14,45 +14,39 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static java.lang.String.format;
 import static repository.ParametrizeMethodsCrud.cleanFile;
 import static util.Constants.*;
 
 public class GsonSkillRepositoryImpl implements SkillRepository {
-    private final File file;
-    private final Gson gson;
-    private final Type collectionType;
-    public GsonSkillRepositoryImpl() {
-        this.file = new File(FILE_SKILLS_PATH);
-        this.gson = new Gson();
-        this.collectionType = new TypeToken<List<Skill>>() {}.getType();
-    }
+    private static final File FILE = new File(FILE_SKILLS_PATH);
+    private static final Gson GSON = new Gson();
+    private static final Type COLLECTION_TYPE = new TypeToken<List<Skill>>() {
+    }.getType();
 
     @Override
     public Skill save(Skill skill) {
-        List<Skill> skills = findAll();
-        ParametrizeMethodsCrud.save(skill, skills, file, gson, collectionType);
+        isExistsSkillIntoFileById(skill.getId());
+        ParametrizeMethodsCrud.save(skill, getSkills(), FILE, GSON, COLLECTION_TYPE);
         return skill;
     }
 
     @Override
+    public void saveAll(List<Skill> skills) {
+        skills.forEach(this::save);
+    }
+
+    @Override
     public Skill findById(Integer id) {
-        List<Skill> skills = findAll();
-        Predicate<Skill> findSkill = skill -> skill.getId().equals(id)
-                && skill.getStatus().equals(Status.ACTIVE);
-        return ParametrizeMethodsCrud.findById(findSkill, skills, NOT_FOUND_SKILL);
+        return ParametrizeMethodsCrud.findById(getPredicateEqualsIdAndStatusActive(id), getSkills(), NOT_FOUND_SKILL);
     }
 
     @Override
     public Skill update(Skill skill) {
-        List<Skill> skills = findAll();
-        Predicate<Skill> findSkill = s -> s.getId().equals(skill.getId());
-        Consumer<Skill> setName = s -> {
-            if (skill.getName() != null && !skill.getName().equals(s.getName()))
-                s.setName(skill.getName());
-        };
-        ParametrizeMethodsCrud.update(skills, findSkill, setName);
-        cleanFile(file);
-        skills.forEach(this::save);
+        List<Skill> skills = getSkills();
+        ParametrizeMethodsCrud.update(skills, getPredicateEqualsId(skill.getId()), getConsumerSetName(skill));
+        cleanFile(FILE);
+        saveAll(skills);
         return skill;
     }
 
@@ -63,7 +57,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public List<Skill> findAll() {
-        return ParametrizeMethodsCrud.findAll(file, gson, collectionType);
+        return ParametrizeMethodsCrud.findAll(FILE, GSON, COLLECTION_TYPE);
     }
 
     @Override
@@ -73,13 +67,11 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public void deleteById(Integer id) {
-        List<Skill> skills = findAll();
-        Predicate<Skill> findSkill = skill -> skill.getId().equals(id) && skill.getStatus().equals(Status.ACTIVE);
-        Consumer<Skill> setStatusDeleted = skill -> skill.setStatus(Status.DELETED);
-        ParametrizeMethodsCrud.deleteById(skills, findSkill, setStatusDeleted);
-        cleanFile(file);
-        skills.forEach(this::save);
-     }
+        List<Skill> skills = getSkills();
+        ParametrizeMethodsCrud.deleteById(skills, getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDelete());
+        cleanFile(FILE);
+        saveAll(skills);
+    }
 
     @Override
     public void delete(Skill skill) {
@@ -88,13 +80,52 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public void deleteAll() {
-        List<Skill> skills = findAll();
-        Consumer<Skill> setStatusDeleted = skill -> {
+        List<Skill> skills = getSkills();
+        ParametrizeMethodsCrud.deleteAll(skills, getConsumerSetStatusDeleteIfStatusActive());
+        cleanFile(FILE);
+        saveAll(skills);
+    }
+
+    private void isExistsSkillIntoFileById(Integer id) {
+        if (FILE.length() != 0) {
+            List<Skill> skills = findAll();
+            if (skills.stream().anyMatch(skill -> skill.getId().equals(id)
+                    && skill.getStatus().equals(Status.ACTIVE))) {
+                throw new IllegalArgumentException(format(EXCEPTION_SKILL_HAS_ALREADY_TAKEN, id));
+            } else if (skills.stream().anyMatch(developer -> developer.getStatus().equals(Status.DELETED)
+                    && developer.getId().equals(id))) {
+                throw new IllegalArgumentException(NOT_FOUND_SKILL);
+            }
+        }
+    }
+
+    private List<Skill> getSkills() {
+        return this.findAll();
+    }
+
+    private Predicate<Skill> getPredicateEqualsId(Integer skillId) {
+        return skill -> skill.getId().equals(skillId);
+    }
+
+    private Predicate<Skill> getPredicateEqualsIdAndStatusActive(Integer skillId) {
+        return skill -> skill.getId().equals(skillId) && skill.getStatus().equals(Status.ACTIVE);
+    }
+
+    private Consumer<Skill> getConsumerSetName(Skill skill) {
+        return s -> {
+            if (skill.getName() != null && !skill.getName().equals(s.getName()))
+                s.setName(skill.getName());
+        };
+    }
+
+    private Consumer<Skill> getConsumerSetStatusDelete() {
+        return skill -> skill.setStatus(Status.DELETED);
+    }
+
+    private Consumer<Skill> getConsumerSetStatusDeleteIfStatusActive() {
+        return skill -> {
             if (skill.getStatus() == Status.ACTIVE)
                 skill.setStatus(Status.DELETED);
         };
-        ParametrizeMethodsCrud.deleteAll(skills, setStatusDeleted);
-        cleanFile(file);
-        skills.forEach(this::save);
-     }
+    }
 }

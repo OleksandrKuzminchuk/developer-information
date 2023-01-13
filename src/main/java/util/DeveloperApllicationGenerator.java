@@ -21,6 +21,7 @@ public class DeveloperApllicationGenerator implements Runnable{
     private final DeveloperView developerView;
     private final SkillView skillView;
     private final SpecialtyView specialtyView;
+    private static final Scanner SCANNER = new Scanner(System.in);
     public DeveloperApllicationGenerator() {
         DeveloperRepository developerRepository = new GsonDeveloperRepositoryImpl();
         SkillRepository skillRepository = new GsonSkillRepositoryImpl();
@@ -28,91 +29,42 @@ public class DeveloperApllicationGenerator implements Runnable{
         DeveloperController developerController = new DeveloperController(developerRepository, skillRepository, specialtyRepository);
         SkillController skillController = new SkillController(skillRepository, developerRepository);
         SpecialtyController specialtyController = new SpecialtyController(specialtyRepository, developerRepository);
-        this.developerView = new DeveloperView(developerController);
-        this.skillView = new SkillView(skillController);
-        this.specialtyView = new SpecialtyView(specialtyController);
+        this.developerView = new DeveloperView(developerController, SCANNER);
+        this.skillView = new SkillView(skillController, SCANNER);
+        this.specialtyView = new SpecialtyView(specialtyController, SCANNER);
     }
 
     @Override
     public void run() {
-        Scanner scanner = new Scanner(System.in);
         System.out.println(DESCRIBE_APPLICATION);
-        String s = "";
-        while (!s.equals("stop")) {
-            s = scanner.nextLine();
-            switch (s) {
-                case DEVELOPERS_ADD:
-                    developerView.save(scanner);
-                    break;
-                case DEVELOPERS_FIND_BY_ID:
-                    developerView.findById(scanner);
-                    break;
-                case DEVELOPERS_FIND_ALL:
-                    developerView.findAll();
-                    break;
-                case DEVELOPERS_UPDATE:
-                    developerView.update(scanner);
-                    break;
-                case DEVELOPERS_DELETE_BY_ID:
-                    developerView.deleteById(scanner);
-                    break;
-                case DEVELOPERS_DELETE_ALL:
-                    developerView.deleteAll();
-                    break;
-                case DEVELOPERS_ADD_SKILL:
-                    developerView.addSkill(scanner);
-                    break;
-                case DEVELOPERS_DELETE_SKILL:
-                    developerView.deleteSkill(scanner);
-                    break;
-                case DEVELOPERS_ADD_SPECIALTY:
-                    developerView.addSpeciality(scanner);
-                    break;
-                case DEVELOPERS_DELETE_SPECIALTY:
-                    developerView.deleteSpecialty(scanner);
-                    break;
-                case DEVELOPERS_FIND_SKILLS_BY_DEVELOPER_ID:
-                    developerView.findSkillsByDeveloperId(scanner);
-                    break;
-                case SKILLS_ADD:
-                    skillView.save(scanner);
-                    break;
-                case SKILLS_FIND_BY_ID:
-                    skillView.findById(scanner);
-                    break;
-                case SKILLS_UPDATE:
-                    skillView.update(scanner);
-                    break;
-                case SKILLS_FIND_ALL:
-                    skillView.findAll();
-                    break;
-                case SKILLS_DELETE_BY_ID:
-                    skillView.deleteById(scanner);
-                    break;
-                case SKILLS_DELETE_ALL:
-                    skillView.deleteAll();
-                    break;
-                case SPECIALTIES_ADD:
-                    specialtyView.save(scanner);
-                    break;
-                case SPECIALTIES_UPDATE:
-                    specialtyView.update(scanner);
-                    break;
-                case SPECIALTIES_FIND_BY_ID:
-                    specialtyView.findById(scanner);
-                    break;
-                case SPECIALTIES_FIND_ALL:
-                    specialtyView.findAll();
-                    break;
-                case SPECIALTIES_DELETE_BY_ID:
-                    specialtyView.deleteById(scanner);
-                    break;
-                case SPECIALTIES_DELETE_ALL:
-                    specialtyView.deleteAll();
-                    break;
-                default:
-                    System.out.println("No correct a request");
-                    break;
+        String userInput = "";
+        while (!userInput.equals("stop")) {
+            userInput = SCANNER.nextLine();
+            switch (userInput) {
+                case DEVELOPERS_ADD -> developerView.save();
+                case DEVELOPERS_FIND_BY_ID -> developerView.findById();
+                case DEVELOPERS_FIND_ALL -> developerView.findAll();
+                case DEVELOPERS_UPDATE -> developerView.update();
+                case DEVELOPERS_DELETE_BY_ID -> developerView.deleteById();
+                case DEVELOPERS_DELETE_ALL -> developerView.deleteAll();
+                case DEVELOPERS_ADD_SKILL -> developerView.addSkill();
+                case DEVELOPERS_DELETE_SKILL -> developerView.deleteSkill();
+                case DEVELOPERS_ADD_SPECIALTY -> developerView.addSpeciality();
+                case DEVELOPERS_DELETE_SPECIALTY -> developerView.deleteSpecialty();
+                case DEVELOPERS_FIND_SKILLS_BY_DEVELOPER_ID -> developerView.findSkillsByDeveloperId();
+                case SKILLS_ADD -> skillView.save();
+                case SKILLS_FIND_BY_ID -> skillView.findById();
+                case SKILLS_UPDATE -> skillView.update();
+                case SKILLS_FIND_ALL -> skillView.findAll();
+                case SKILLS_DELETE_BY_ID -> skillView.deleteById();
+                case SKILLS_DELETE_ALL -> skillView.deleteAll();
+                case SPECIALTIES_ADD -> specialtyView.save();
+                case SPECIALTIES_UPDATE -> specialtyView.update();
+                case SPECIALTIES_FIND_BY_ID -> specialtyView.findById();
+                case SPECIALTIES_FIND_ALL -> specialtyView.findAll();
+                case SPECIALTIES_DELETE_BY_ID -> specialtyView.deleteById();
+                case SPECIALTIES_DELETE_ALL -> specialtyView.deleteAll();
+                default -> System.out.println("No correct a request");
             }
         }
     }

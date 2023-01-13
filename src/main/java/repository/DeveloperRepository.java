@@ -7,7 +7,6 @@ import model.Specialty;
 import java.util.List;
 
 public interface DeveloperRepository extends GenericRepository<Developer, Integer> {
-    Developer update(Developer developer);
     Skill addSkill(Integer developerId, Skill skill);
     void deleteSkill(Integer developerId, Integer skillId);
     List<Skill> findSkillsByDeveloperId(Integer id);

@@ -12,11 +12,14 @@ import static util.Constants.*;
 
 public class SkillView {
     private final SkillController controller;
+    private final Scanner scanner;
 
-    public SkillView(SkillController controller) {
+    public SkillView(SkillController controller, Scanner scanner) {
         this.controller = controller;
+        this.scanner = scanner;
     }
-    public void save(Scanner scanner){
+
+    public void save() {
         try {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
@@ -26,26 +29,28 @@ public class SkillView {
             Skill saved = controller.save(new Skill(id, name));
             System.out.println(saved + TEXT_SAVE_SUCCESSFULLY);
             scanner.reset();
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
-    public void findById(Scanner scanner){
+
+    public void findById() {
         try {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
             scanner.nextLine();
             Skill skill = controller.findById(id);
             System.out.println(skill);
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
-    public void update(Scanner scanner){
+
+    public void update() {
         try {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
@@ -55,32 +60,35 @@ public class SkillView {
             Skill updated = controller.update(new Skill(id, newName));
             System.out.println(updated + TEXT_UPDATED_SUCCESSFULLY);
             scanner.reset();
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
-    public void findAll(){
+
+    public void findAll() {
         Comparator<Skill> sortById = Comparator.comparing(Skill::getId);
         controller.findAll().stream()
                 .sorted(sortById)
                 .forEach(skill -> System.out.print(skill + "\n"));
     }
-    public void deleteById(Scanner scanner){
+
+    public void deleteById() {
         try {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
             scanner.nextLine();
             String deleted = controller.deleteById(id);
             System.out.println(deleted);
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
-    public void deleteAll(){
+
+    public void deleteAll() {
         String deletedAll = controller.deleteAll();
         System.out.println(deletedAll);
     }

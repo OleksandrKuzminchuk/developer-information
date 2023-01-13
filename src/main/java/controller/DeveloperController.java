@@ -8,15 +8,12 @@ import repository.DeveloperRepository;
 import repository.SkillRepository;
 import repository.SpecialtyRepository;
 
-import java.io.File;
 import java.util.List;
 
-import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static util.Constants.*;
 
 public class DeveloperController {
-    private final File file;
     private final DeveloperRepository repository;
     private final SkillRepository skillRepository;
     private final SpecialtyRepository specialtyRepository;
@@ -25,11 +22,9 @@ public class DeveloperController {
         this.repository = developerRepository;
         this.skillRepository = skillRepository;
         this.specialtyRepository = specialtyRepository;
-        this.file = new File(FILE_DEVELOPERS_PATH);
     }
 
     public Developer save(Developer developer) {
-        isExistsDeveloperIntoFileById(developer.getId());
         assignStatusActiveIfNull(developer);
         return repository.save(developer);
     }
@@ -90,18 +85,6 @@ public class DeveloperController {
         return repository.findSkillsByDeveloperId(id);
     }
 
-    private void isExistsDeveloperIntoFileById(Integer id) {
-        if (file.length() != 0) {
-            List<Developer> developers = findAll();
-            if (developers.stream().anyMatch(developer -> developer.getId().equals(id)
-                    && developer.getStatus().equals(Status.ACTIVE))) {
-                throw new IllegalArgumentException(format(EXCEPTION_DEVELOPER_HAS_ALREADY_TAKEN, id));
-            } else if (developers.stream().anyMatch(developer -> developer.getId().equals(id)
-                    && developer.getStatus().equals(Status.DELETED))) {
-                throw new IllegalArgumentException(NOT_FOUND_DEVELOPER);
-            }
-        }
-    }
     private static void assignStatusActiveIfNull(Developer developer) {
         if (developer.getStatus() == null) {
             developer.setStatus(Status.ACTIVE);

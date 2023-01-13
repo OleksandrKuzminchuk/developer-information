@@ -12,11 +12,15 @@ import static util.Constants.*;
 
 public class SpecialtyView {
     private final SpecialtyController controller;
+    private final Scanner scanner;
 
-    public SpecialtyView(SpecialtyController controller) {
+
+    public SpecialtyView(SpecialtyController controller, Scanner scanner) {
         this.controller = controller;
+        this.scanner = scanner;
     }
-    public void save(Scanner scanner){
+
+    public void save() {
         try {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
@@ -26,14 +30,15 @@ public class SpecialtyView {
             Specialty saved = controller.save(new Specialty(id, name));
             System.out.println(saved + TEXT_SAVE_SUCCESSFULLY);
             scanner.reset();
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
-    public void update(Scanner scanner){
-        try{
+
+    public void update() {
+        try {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
             scanner.nextLine();
@@ -42,45 +47,49 @@ public class SpecialtyView {
             Specialty updated = controller.update(new Specialty(id, newName));
             System.out.println(updated + TEXT_UPDATED_SUCCESSFULLY);
             scanner.reset();
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
-    public void findById(Scanner scanner){
+
+    public void findById() {
         try {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
             scanner.nextLine();
             Specialty found = controller.findById(id);
             System.out.println(found);
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
-    public void findAll(){
+
+    public void findAll() {
         Comparator<Specialty> sortById = Comparator.comparing(Specialty::getId);
         controller.findAll().stream()
                 .sorted(sortById)
                 .forEach(specialty -> System.out.print(specialty + "\n"));
     }
-    public void deleteById(Scanner scanner){
+
+    public void deleteById() {
         try {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
             scanner.nextLine();
             String deleted = controller.deleteById(id);
             System.out.println(deleted);
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
-        }catch (NotFoundException e){
+        } catch (NotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
-    public void deleteAll(){
+
+    public void deleteAll() {
         String deletedAll = controller.deleteAll();
         System.out.println(deletedAll);
     }

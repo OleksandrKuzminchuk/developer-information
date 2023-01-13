@@ -30,7 +30,7 @@
 "status":"ACTIVE"},
 {"id":444,"firstName":"fff","lastName":"fff","skills":[],"specialty":{"id":444,"name":"","status":"DELETED"},
 "status":"DELETED"},
-{"id":555,"firstName":"ffff","lastName":"fff","skills":[],"specialty":{"id":2000000000,"status":"DELETED"},
+{"id":555,"firstName":"ffff","lastName":"fff","skills":[{"id":2222,"name":"ds","status":"ACTIVE"}],"specialty":{"id":2000000000,"status":"DELETED"},
 "status":"ACTIVE"},
 {"id":1111,"firstName":"dsd","lastName":"ds","skills":[{"id":1111,"name":"dsd","status":"DELETED"},
 {"id":2222,"name":"ds","status":"ACTIVE"}],"specialty":{"id":2000000000},

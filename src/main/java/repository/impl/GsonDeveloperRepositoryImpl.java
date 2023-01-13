@@ -37,7 +37,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     @Override
     public void saveAll(List<Developer> developers) {
-        ParametrizeMethodsCrud.saveAll(developers, FILE, GSON, COLLECTION_TYPE);
+        developers.forEach(this::save);
     }
 
     @Override

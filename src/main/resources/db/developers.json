@@ -40,4 +40,5 @@
 {"id":11111,"firstName":"ssss","lastName":"sss","skills":[{"id":2222,"name":"ds","status":"ACTIVE"}],"specialty":{"id":11111,"name":"sss","status":"ACTIVE"},
 "status":"DELETED"},
 {"id":123,"firstName":"ds","lastName":"ds","skills":[],"specialty":{"id":123,"name":"ds","status":"ACTIVE"},
-"status":"ACTIVE"}]
+"status":"ACTIVE"},
+{"id":6,"firstName":"Alex","lastName":"Hurm","skills":[{"id":4,"name":"Java","status":"ACTIVE"}],"status":"ACTIVE"}]

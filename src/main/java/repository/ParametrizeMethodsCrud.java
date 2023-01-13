@@ -67,10 +67,6 @@ public interface ParametrizeMethodsCrud {
         cleanFile(file);
     }
 
-    static <T> void saveAll(List<T> list, File file, Gson gson, Type type){
-        list.forEach(t -> save(t, list, file, gson, type));
-    }
-
     static <T> void deleteById(List<T> list, Predicate<T> predicate, Consumer<T> consumer, File file) {
         list.stream().filter(predicate).forEach(consumer);
         cleanFile(file);

@@ -37,13 +37,13 @@ public class SkillController {
     public String deleteById(Integer id) {
         repository.existsById(id);
         repository.deleteById(id);
-        developerRepository.deleteSkillByIdIfActiveSetStatusDeletedIfDeleted(id);
+        developerRepository.deleteSkillByIdIfActiveOrSetStatusDeletedIfDeleted(id);
         return RESPONSE_OK;
     }
 
     public String deleteAll() {
         repository.deleteAll();
-        developerRepository.deleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted();
+        developerRepository.deleteAllSkillsActiveOrAllSetStatusDeletedIfDeleted();
         return RESPONSE_OK;
     }
 }

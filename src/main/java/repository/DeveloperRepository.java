@@ -12,8 +12,8 @@ public interface DeveloperRepository extends GenericRepository<Developer, Intege
     List<Skill> findSkillsByDeveloperId(Integer id);
     Specialty addSpecialty(Integer developerId, Specialty speciality);
     void deleteSpecialty(Integer developerId, Integer specialityId);
-    void deleteSkillByIdIfActiveSetStatusDeletedIfDeleted(Integer skillId);
-    void deleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted();
-    void deleteSpecialtyByIdSetSpecialtyStatusDeleteIfNonNullAndEqualsId(Integer specialtyId);
-    void deleteAllSpecialtySetSpecialtyStatusDeletedIfStatusDeleted();
+    void deleteSkillByIdIfActiveOrSetStatusDeletedIfDeleted(Integer skillId);
+    void deleteAllSkillsActiveOrAllSetStatusDeletedIfDeleted();
+    void deleteSpecialtyByIdOrSetSpecialtyStatusDeleteIfNonNullAndEqualsId(Integer specialtyId);
+    void deleteAllSpecialtyOrSetSpecialtyStatusDeletedIfStatusDeleted();
 }

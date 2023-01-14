@@ -37,13 +37,13 @@ public class SpecialtyController {
     public String deleteById(Integer id) {
         repository.existsById(id);
         repository.deleteById(id);
-        developerRepository.deleteSpecialtyByIdSetSpecialtyStatusDeleteIfNonNullAndEqualsId(id);
+        developerRepository.deleteSpecialtyByIdOrSetSpecialtyStatusDeleteIfNonNullAndEqualsId(id);
         return RESPONSE_OK;
     }
 
     public String deleteAll() {
         repository.deleteAll();
-        developerRepository.deleteAllSpecialtySetSpecialtyStatusDeletedIfStatusDeleted();
+        developerRepository.deleteAllSpecialtyOrSetSpecialtyStatusDeletedIfStatusDeleted();
         return RESPONSE_OK;
     }
 }

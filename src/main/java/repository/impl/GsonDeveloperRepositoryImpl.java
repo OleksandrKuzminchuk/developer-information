@@ -149,7 +149,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public void deleteSkillByIdIfActiveSetStatusDeletedIfDeleted(Integer skillId) {
+    public void deleteSkillByIdIfActiveOrSetStatusDeletedIfDeleted(Integer skillId) {
         List<Developer> developers = getDevelopers();
         developers.forEach(getConsumerDeleteSkillIfActiveSetStatusDeletedIfDeleted(skillId));
         cleanFile(FILE);
@@ -157,7 +157,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public void deleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted() {
+    public void deleteAllSkillsActiveOrAllSetStatusDeletedIfDeleted() {
         List<Developer> developers = getDevelopers();
         developers.forEach(getConsumerDeleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted());
         cleanFile(FILE);
@@ -165,7 +165,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public void deleteSpecialtyByIdSetSpecialtyStatusDeleteIfNonNullAndEqualsId(Integer specialtyId) {
+    public void deleteSpecialtyByIdOrSetSpecialtyStatusDeleteIfNonNullAndEqualsId(Integer specialtyId) {
         List<Developer> developers = getDevelopers();
         developers.stream()
                 .filter(getPredicateSpecialtyNonNullAndEqualsId(specialtyId))
@@ -175,7 +175,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public void deleteAllSpecialtySetSpecialtyStatusDeletedIfStatusDeleted() {
+    public void deleteAllSpecialtyOrSetSpecialtyStatusDeletedIfStatusDeleted() {
         List<Developer> developers = getDevelopers();
         developers.forEach(getConsumerSetSpecialtyStatusDelete());
         cleanFile(FILE);

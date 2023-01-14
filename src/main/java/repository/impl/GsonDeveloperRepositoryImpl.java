@@ -147,6 +147,40 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
         }
     }
 
+    @Override
+    public void deleteSkillByIdIfActiveSetStatusDeletedIfDeleted(Integer skillId) {
+        List<Developer> developers = getDevelopers();
+        developers.forEach(getConsumerDeleteSkillIfActiveSetStatusDeletedIfDeleted(skillId));
+        cleanFile(FILE);
+        saveAll(developers);
+    }
+
+    @Override
+    public void deleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted() {
+        List<Developer> developers = getDevelopers();
+        developers.forEach(getConsumerDeleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted());
+        cleanFile(FILE);
+        saveAll(developers);
+    }
+
+    @Override
+    public void deleteSpecialtyByIdSetSpecialtyStatusDeleteIfNonNullAndEqualsId(Integer specialtyId) {
+        List<Developer> developers = getDevelopers();
+        developers.stream()
+                .filter(getPredicateSpecialtyNonNullAndEqualsId(specialtyId))
+                .forEach(getConsumerSetSpecialtyStatusDelete());
+        cleanFile(FILE);
+        saveAll(developers);
+    }
+
+    @Override
+    public void deleteAllSpecialtySetSpecialtyStatusDeletedIfStatusDeleted() {
+        List<Developer> developers = getDevelopers();
+        developers.forEach(getConsumerSetSpecialtyStatusDelete());
+        cleanFile(FILE);
+        saveAll(developers);
+    }
+
     private void isExistsDeveloperIntoFileById(Integer id) {
         if (FILE.length() != 0) {
             List<Developer> developers = findAll();
@@ -252,5 +286,38 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
                 }
             }
         };
+    }
+    private Consumer<Developer> getConsumerDeleteSkillIfActiveSetStatusDeletedIfDeleted(Integer skillId){
+        Predicate<Skill> setStatusDeleteIf = skill -> skill.getId().equals(skillId);
+        Consumer<Skill> setStatusDelete = skill -> {
+            if (skill.getId().equals(skillId))
+                skill.setStatus(Status.DELETED);
+        };
+        return dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE))
+                dev.getSkills().removeIf(setStatusDeleteIf);
+            dev.getSkills().forEach(setStatusDelete);
+        };
+    }
+    private Consumer<Developer> getConsumerDeleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted(){
+        Consumer<Skill> setStatusDelete = skill -> skill.setStatus(Status.DELETED);
+        return dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE))
+                dev.getSkills().removeAll(dev.getSkills());
+            dev.getSkills().forEach(setStatusDelete);
+        };
+    }
+    private Consumer<Developer> getConsumerSetSpecialtyStatusDelete() {
+        return dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE)) {
+                dev.setSpecialty(null);
+            } else {
+                dev.getSpecialty().setStatus(Status.DELETED);
+            }
+        };
+    }
+    private Predicate<Developer> getPredicateSpecialtyNonNullAndEqualsId(Integer specialtyId){
+        return dev -> dev.getSpecialty() != null &&
+                dev.getSpecialty().getId().equals(specialtyId);
     }
 }

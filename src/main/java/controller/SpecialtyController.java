@@ -1,17 +1,12 @@
 package controller;
 
-import model.Developer;
 import model.Specialty;
 import model.Status;
 import repository.DeveloperRepository;
 import repository.SpecialtyRepository;
 
-import java.io.File;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
-import static repository.ParametrizeMethodsCrud.cleanFile;
 import static util.Constants.*;
 
 public class SpecialtyController {
@@ -44,21 +39,13 @@ public class SpecialtyController {
     public String deleteById(Integer id) {
         repository.existsById(id);
         repository.deleteById(id);
-        List<Developer> developers = developerRepository.findAll();
-        developers.stream()
-                .filter(getPredicateSpecialtyNonNullAndEqualsId(id))
-                .forEach(getConsumerSetSpecialtyStatusDelete());
-        cleanFile(new File(FILE_DEVELOPERS_PATH));
-        developers.forEach(developerRepository::save);
+        developerRepository.deleteSpecialtyByIdSetSpecialtyStatusDeleteIfNonNullAndEqualsId(id);
         return RESPONSE_OK;
     }
 
     public String deleteAll() {
         repository.deleteAll();
-        List<Developer> developers = developerRepository.findAll();
-        developers.forEach(getConsumerSetSpecialtyStatusDelete());
-        cleanFile(new File(FILE_DEVELOPERS_PATH));
-        developers.forEach(developerRepository::save);
+        developerRepository.deleteAllSpecialtySetSpecialtyStatusDeletedIfStatusDeleted();
         return RESPONSE_OK;
     }
 
@@ -66,19 +53,5 @@ public class SpecialtyController {
         if (specialty.getStatus() == null) {
             specialty.setStatus(Status.ACTIVE);
         }
-    }
-
-    private Consumer<Developer> getConsumerSetSpecialtyStatusDelete() {
-        return dev -> {
-            if (dev.getStatus().equals(Status.ACTIVE)) {
-                dev.setSpecialty(null);
-            } else {
-                dev.getSpecialty().setStatus(Status.DELETED);
-            }
-        };
-    }
-    private Predicate<Developer> getPredicateSpecialtyNonNullAndEqualsId(Integer specialtyId){
-        return dev -> dev.getSpecialty() != null &&
-                dev.getSpecialty().getId().equals(specialtyId);
     }
 }

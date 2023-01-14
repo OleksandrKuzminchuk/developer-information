@@ -30,6 +30,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     @Override
     public Developer save(Developer developer) {
+        assignStatusActiveIfNull(developer);
         isExistsDeveloperIntoFileById(developer.getId());
         ParametrizeMethodsCrud.save(developer, getDevelopers(), FILE, GSON, COLLECTION_TYPE);
         return developer;
@@ -319,5 +320,10 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     private Predicate<Developer> getPredicateSpecialtyNonNullAndEqualsId(Integer specialtyId){
         return dev -> dev.getSpecialty() != null &&
                 dev.getSpecialty().getId().equals(specialtyId);
+    }
+    private void assignStatusActiveIfNull(Developer developer) {
+        if (developer.getStatus() == null) {
+            developer.setStatus(Status.ACTIVE);
+        }
     }
 }

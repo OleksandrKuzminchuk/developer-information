@@ -1,7 +1,6 @@
 package controller;
 
 import model.Skill;
-import model.Status;
 import repository.DeveloperRepository;
 import repository.SkillRepository;
 
@@ -19,7 +18,6 @@ public class SkillController {
     }
 
     public Skill save(Skill skill) {
-        assignStatusActiveIfNull(skill);
         return repository.save(skill);
     }
 
@@ -47,11 +45,5 @@ public class SkillController {
         repository.deleteAll();
         developerRepository.deleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted();
         return RESPONSE_OK;
-    }
-
-    private static void assignStatusActiveIfNull(Skill skill) {
-        if (skill.getStatus() == null) {
-            skill.setStatus(Status.ACTIVE);
-        }
     }
 }

@@ -25,6 +25,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public Skill save(Skill skill) {
+        assignStatusActiveIfNull(skill);
         isExistsSkillIntoFileById(skill.getId());
         ParametrizeMethodsCrud.save(skill, getSkills(), FILE, GSON, COLLECTION_TYPE);
         return skill;
@@ -123,5 +124,10 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
             if (skill.getStatus() == Status.ACTIVE)
                 skill.setStatus(Status.DELETED);
         };
+    }
+    private void assignStatusActiveIfNull(Skill skill) {
+        if (skill.getStatus() == null) {
+            skill.setStatus(Status.ACTIVE);
+        }
     }
 }

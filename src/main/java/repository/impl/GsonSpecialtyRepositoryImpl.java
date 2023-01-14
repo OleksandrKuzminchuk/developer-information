@@ -25,6 +25,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
 
     @Override
     public Specialty save(Specialty specialty) {
+        assignStatusActiveIfNull(specialty);
         isExistsSpecialityIntoFileById(specialty.getId());
         ParametrizeMethodsCrud.save(specialty, getSpecialties(), FILE, GSON, COLLECTION_TYPE);
         return specialty;
@@ -125,5 +126,10 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
             if (specialty.getStatus() == Status.ACTIVE)
                 specialty.setStatus(Status.DELETED);
         };
+    }
+    private void assignStatusActiveIfNull(Specialty specialty) {
+        if (specialty.getStatus() == null) {
+            specialty.setStatus(Status.ACTIVE);
+        }
     }
 }

@@ -3,7 +3,6 @@ package controller;
 import model.Developer;
 import model.Skill;
 import model.Specialty;
-import model.Status;
 import repository.DeveloperRepository;
 import repository.SkillRepository;
 import repository.SpecialtyRepository;
@@ -24,7 +23,6 @@ public class DeveloperController {
     }
 
     public Developer save(Developer developer) {
-        assignStatusActiveIfNull(developer);
         return repository.save(developer);
     }
 
@@ -80,11 +78,5 @@ public class DeveloperController {
 
     public List<Skill> findSkillsByDeveloperId(Integer id) {
         return repository.findSkillsByDeveloperId(id);
-    }
-
-    private static void assignStatusActiveIfNull(Developer developer) {
-        if (developer.getStatus() == null) {
-            developer.setStatus(Status.ACTIVE);
-        }
     }
 }

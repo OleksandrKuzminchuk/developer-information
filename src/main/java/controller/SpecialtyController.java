@@ -1,7 +1,6 @@
 package controller;
 
 import model.Specialty;
-import model.Status;
 import repository.DeveloperRepository;
 import repository.SpecialtyRepository;
 
@@ -19,7 +18,6 @@ public class SpecialtyController {
     }
 
     public Specialty save(Specialty specialty) {
-        assignStatusActiveIfNull(specialty);
         return repository.save(specialty);
     }
 
@@ -47,11 +45,5 @@ public class SpecialtyController {
         repository.deleteAll();
         developerRepository.deleteAllSpecialtySetSpecialtyStatusDeletedIfStatusDeleted();
         return RESPONSE_OK;
-    }
-
-    private static void assignStatusActiveIfNull(Specialty specialty) {
-        if (specialty.getStatus() == null) {
-            specialty.setStatus(Status.ACTIVE);
-        }
     }
 }

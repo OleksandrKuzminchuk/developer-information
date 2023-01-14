@@ -1,12 +1,2 @@
-[{"id":1,"name":"Maven","status":"DELETED"},
-{"id":2,"name":"Spring","status":"DELETED"},
-{"id":3,"name":"Hibernate","status":"DELETED"},
-{"id":45,"name":"ffdfffdfdf","status":"DELETED"},
-{"id":11,"name":"dsds","status":"DELETED"},
-{"id":12,"name":"ds","status":"DELETED"},
-{"id":111,"name":"aaa","status":"DELETED"},
-{"id":333,"name":"sss","status":"DELETED"},
-{"id":1111,"name":"dsd","status":"DELETED"},
-{"id":2222,"name":"GIT","status":"ACTIVE"},
-{"id":4,"name":"Java","status":"ACTIVE"},
-{"id":23,"name":"Jira","status":"ACTIVE"}]
+[{"id":1,"name":"sdsd","status":"DELETED"},
+{"id":2,"name":"ds","status":"DELETED"}]

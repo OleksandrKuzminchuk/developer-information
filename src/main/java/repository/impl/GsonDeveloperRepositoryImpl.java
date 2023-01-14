@@ -72,7 +72,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public void deleteById(Integer id) {
         List<Developer> developers = getDevelopers();
-        ParametrizeMethodsCrud.deleteById(getDevelopers(), getPredicateEqualsIdAndStatusActive(id),
+        ParametrizeMethodsCrud.deleteById(developers, getPredicateEqualsIdAndStatusActive(id),
                 getConsumerSetStatusDeleted(), FILE);
         saveAll(developers);
     }
@@ -85,7 +85,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public void deleteAll() {
         List<Developer> developers = getDevelopers();
-        ParametrizeMethodsCrud.deleteAll(getDevelopers(), getConsumerSetAllStatusDeleted(), FILE);
+        ParametrizeMethodsCrud.deleteAll(developers, getConsumerSetAllStatusDeleted(), FILE);
         saveAll(developers);
     }
 
@@ -140,9 +140,11 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public List<Skill> findSkillsByDeveloperId(Integer id) {
         Developer developer = findById(id);
-        if (developer.getSkills().isEmpty())
+        if (developer.getSkills().isEmpty()) {
             throw new NotFoundException(EMPTY_LIST);
-        return developer.getSkills();
+        }else {
+            return developer.getSkills();
+        }
     }
 
     private void isExistsDeveloperIntoFileById(Integer id) {
@@ -183,9 +185,11 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     private Predicate<Developer> getPredicateIsUniqueSkillInDeveloperList(Skill skill) {
         return developer -> {
-            if (developer.getSkills().stream().anyMatch(s -> s.getId().equals(skill.getId())))
+            if (developer.getSkills().stream().anyMatch(s -> s.getId().equals(skill.getId()))) {
                 throw new NotValidException(DEVELOPER_HAS_SKILL);
-            return true;
+            }else {
+                return true;
+            }
         };
     }
 
@@ -216,9 +220,11 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     private Predicate<Developer> getPredicateIsUniqueSpecialityInDeveloper(Specialty specialty) {
         return developer -> {
-            if (developer.getSpecialty() != null && developer.getSpecialty().getId().equals(specialty.getId()))
+            if (developer.getSpecialty() != null && developer.getSpecialty().getId().equals(specialty.getId())){
                 throw new NotValidException(DEVELOPER_HAS_SPECIALITY);
-            return true;
+            }else {
+                return true;
+            }
         };
     }
 

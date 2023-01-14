@@ -1,11 +1,1 @@
-[{"id":1,"name":"IT","status":"DELETED"},
-{"id":2,"name":"HR","status":"DELETED"},
-{"id":3,"name":"CEO","status":"DELETED"},
-{"id":11,"name":"ssss","status":"DELETED"},
-{"id":1111111,"name":"sdsd","status":"DELETED"},
-{"id":12,"name":"sss","status":"DELETED"},
-{"id":111,"name":"ssss","status":"DELETED"},
-{"id":333,"name":"ddddd","status":"DELETED"},
-{"id":444,"name":"","status":"DELETED"},
-{"id":11111,"name":"sss","status":"ACTIVE"},
-{"id":4,"name":"IT","status":"ACTIVE"}]
+[{"id":1,"name":"dsd","status":"ACTIVE"}]

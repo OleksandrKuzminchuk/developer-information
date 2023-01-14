@@ -44,18 +44,8 @@ public class SkillController {
     public String deleteById(Integer id) {
         repository.existsById(id);
         repository.deleteById(id);
-        List<Developer> developers = developerRepository.findAll();
-        Predicate<Skill> setStatusDeleteIf = s -> s.getId().equals(id);
-        Consumer<Skill> setStatusDelete = skill -> {
-            if (skill.getId().equals(id))
-                skill.setStatus(Status.DELETED);
-        };
-        Consumer<Developer> setSkillStatusDeleteById = dev -> {
-            if (dev.getStatus().equals(Status.ACTIVE))
-                dev.getSkills().removeIf(setStatusDeleteIf);
-            dev.getSkills().forEach(setStatusDelete);
-        };
-        developers.forEach(setSkillStatusDeleteById);
+        List<Developer> developers = getDevelopers();
+        developers.forEach(getConsumerDeleteSkillIfActiveSetStatusDeletedIfDeleted(id));
         cleanFile(new File(FILE_DEVELOPERS_PATH));
         developers.forEach(developerRepository::save);
         return RESPONSE_OK;
@@ -63,14 +53,8 @@ public class SkillController {
 
     public String deleteAll() {
         repository.deleteAll();
-        List<Developer> developers = developerRepository.findAll();
-        Consumer<Skill> setStatusDelete = skill -> skill.setStatus(Status.DELETED);
-        Consumer<Developer> setSkillStatusDeleteById = dev -> {
-            if (dev.getStatus().equals(Status.ACTIVE))
-                dev.getSkills().removeAll(dev.getSkills());
-            dev.getSkills().forEach(setStatusDelete);
-        };
-        developers.forEach(setSkillStatusDeleteById);
+        List<Developer> developers = getDevelopers();
+        developers.forEach(getConsumerDeleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted());
         cleanFile(new File(FILE_DEVELOPERS_PATH));
         developers.forEach(developerRepository::save);
         return RESPONSE_OK;
@@ -80,5 +64,28 @@ public class SkillController {
         if (skill.getStatus() == null) {
             skill.setStatus(Status.ACTIVE);
         }
+    }
+    private List<Developer> getDevelopers(){
+        return developerRepository.findAll();
+    }
+    private Consumer<Developer> getConsumerDeleteSkillIfActiveSetStatusDeletedIfDeleted(Integer skillId){
+        Predicate<Skill> setStatusDeleteIf = skill -> skill.getId().equals(skillId);
+        Consumer<Skill> setStatusDelete = skill -> {
+            if (skill.getId().equals(skillId))
+                skill.setStatus(Status.DELETED);
+        };
+        return dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE))
+                dev.getSkills().removeIf(setStatusDeleteIf);
+            dev.getSkills().forEach(setStatusDelete);
+        };
+    }
+    private Consumer<Developer> getConsumerDeleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted(){
+        Consumer<Skill> setStatusDelete = skill -> skill.setStatus(Status.DELETED);
+        return dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE))
+                dev.getSkills().removeAll(dev.getSkills());
+            dev.getSkills().forEach(setStatusDelete);
+        };
     }
 }

@@ -45,8 +45,9 @@ public class SpecialtyController {
         repository.existsById(id);
         repository.deleteById(id);
         List<Developer> developers = developerRepository.findAll();
-        Predicate<Developer> filterActiveAndHasSpecialty = dev -> dev.getSpecialty().getId().equals(id);
-        developers.stream().filter(filterActiveAndHasSpecialty).forEach(getConsumerSetSpecialtyStatusDelete());
+        developers.stream()
+                .filter(getPredicateSpecialtyNonNullAndEqualsId(id))
+                .forEach(getConsumerSetSpecialtyStatusDelete());
         cleanFile(new File(FILE_DEVELOPERS_PATH));
         developers.forEach(developerRepository::save);
         return RESPONSE_OK;
@@ -69,9 +70,15 @@ public class SpecialtyController {
 
     private Consumer<Developer> getConsumerSetSpecialtyStatusDelete() {
         return dev -> {
-            if (dev.getStatus().equals(Status.ACTIVE))
+            if (dev.getStatus().equals(Status.ACTIVE)) {
                 dev.setSpecialty(null);
-            dev.getSpecialty().setStatus(Status.DELETED);
+            } else {
+                dev.getSpecialty().setStatus(Status.DELETED);
+            }
         };
+    }
+    private Predicate<Developer> getPredicateSpecialtyNonNullAndEqualsId(Integer specialtyId){
+        return dev -> dev.getSpecialty() != null &&
+                dev.getSpecialty().getId().equals(specialtyId);
     }
 }

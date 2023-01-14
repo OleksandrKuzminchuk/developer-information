@@ -43,7 +43,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
 
     @Override
     public Developer findById(Integer id) {
-        return ParametrizeMethodsCrud.findById(getPredicateEqualsIdAndStatusActive(id), getDevelopers(), NOT_FOUND_DEVELOPER);
+        return ParametrizeMethodsCrud.findById(getPredicateDeveloperIdEqualsIdAndStatusActive(id), getDevelopers(), NOT_FOUND_DEVELOPER);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public Developer update(Developer developer) {
         List<Developer> developers = getDevelopers();
-        ParametrizeMethodsCrud.update(developers, getPredicateEqualsIdDeveloper(developer.getId()),
+        ParametrizeMethodsCrud.update(developers, getPredicateDeveloperIdEqualsId(developer.getId()),
                 getConsumerUpdate(developer), FILE);
         saveAll(developers);
         return developer;
@@ -73,8 +73,8 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public void deleteById(Integer id) {
         List<Developer> developers = getDevelopers();
-        ParametrizeMethodsCrud.deleteById(developers, getPredicateEqualsIdAndStatusActive(id),
-                getConsumerSetStatusDeleted(), FILE);
+        ParametrizeMethodsCrud.deleteById(developers, getPredicateDeveloperIdEqualsIdAndStatusActive(id),
+                getConsumerSetDeveloperDeletedStatus(), FILE);
         saveAll(developers);
     }
 
@@ -86,7 +86,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public void deleteAll() {
         List<Developer> developers = getDevelopers();
-        ParametrizeMethodsCrud.deleteAll(developers, getConsumerSetAllStatusDeleted(), FILE);
+        ParametrizeMethodsCrud.deleteAll(developers, getConsumerSetDeletedStatusIfStatusEqualsActive(), FILE);
         saveAll(developers);
     }
 
@@ -94,9 +94,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     public Skill addSkill(Integer developerId, Skill skill) {
         List<Developer> developers = getDevelopers();
         developers.stream()
-                .filter(getPredicateEqualsIdDeveloper(developerId))
+                .filter(getPredicateDeveloperIdEqualsId(developerId))
                 .filter(getPredicateIsUniqueSkillInDeveloperList(skill))
-                .forEach(getConsumerAddSkill(developerId, skill));
+                .forEach(getConsumerAddSkillIfDevIdEqualsDevId(developerId, skill));
         cleanFile(FILE);
         saveAll(developers);
         return skill;
@@ -106,9 +106,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     public void deleteSkill(Integer developerId, Integer skillId) {
         List<Developer> developers = getDevelopers();
         developers.stream()
-                .filter(getPredicateEqualsIdDeveloper(developerId))
+                .filter(getPredicateDeveloperIdEqualsId(developerId))
                 .filter(getPredicateIsThereUniqueSkillInDeveloperList(skillId))
-                .forEach(getConsumerDeleteSkill(skillId));
+                .forEach(getConsumerDeleteSkillIfSkillIdEqualsId(skillId));
         cleanFile(FILE);
         developers.forEach(this::save);
     }
@@ -117,7 +117,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     public Specialty addSpecialty(Integer developerId, Specialty specialty) {
         List<Developer> developers = getDevelopers();
         developers.stream()
-                .filter(getPredicateEqualsIdDeveloper(developerId))
+                .filter(getPredicateDeveloperIdEqualsId(developerId))
                 .filter(getPredicateIsUniqueSpecialityInDeveloper(specialty))
                 .forEach(getPredicateAddSpeciality(developerId, specialty));
         cleanFile(FILE);
@@ -129,9 +129,9 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     public void deleteSpecialty(Integer developerId, Integer specialityId) {
         List<Developer> developers = getDevelopers();
         developers.stream()
-                .filter(getPredicateFindBySpecialty(developerId, specialityId))
+                .filter(getPredicateFilterSpecialtyIfDevIdEqualsIdAndSpecialtyIdEqualsId(developerId, specialityId))
                 .findFirst()
-                .ifPresentOrElse(getConsumerDeleteSpecialty(), () -> {
+                .ifPresentOrElse(getConsumerDeleteSpecialtySetNull(), () -> {
                     throw new NotValidException(DEVELOPER_HAS_NOT_SPECIALITY);
                 });
         cleanFile(FILE);
@@ -151,7 +151,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public void deleteSkillByIdIfActiveOrSetStatusDeletedIfDeleted(Integer skillId) {
         List<Developer> developers = getDevelopers();
-        developers.forEach(getConsumerDeleteSkillIfActiveSetStatusDeletedIfDeleted(skillId));
+        developers.forEach(getConsumerDeleteSkillIfActiveOrSetStatusDeletedIfStatusDeleted(skillId));
         cleanFile(FILE);
         saveAll(developers);
     }
@@ -168,8 +168,8 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     public void deleteSpecialtyByIdOrSetSpecialtyStatusDeleteIfNonNullAndEqualsId(Integer specialtyId) {
         List<Developer> developers = getDevelopers();
         developers.stream()
-                .filter(getPredicateSpecialtyNonNullAndEqualsId(specialtyId))
-                .forEach(getConsumerSetSpecialtyStatusDelete());
+                .filter(getPredicateSpecialtyIdNonNullAndEqualsId(specialtyId))
+                .forEach(getConsumerSetSpecialtyDeleteStatus());
         cleanFile(FILE);
         saveAll(developers);
     }
@@ -177,7 +177,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public void deleteAllSpecialtyOrSetSpecialtyStatusDeletedIfStatusDeleted() {
         List<Developer> developers = getDevelopers();
-        developers.forEach(getConsumerSetSpecialtyStatusDelete());
+        developers.forEach(getConsumerSetSpecialtyDeleteStatus());
         cleanFile(FILE);
         saveAll(developers);
     }
@@ -199,22 +199,22 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
         return findAll();
     }
 
-    private Predicate<Developer> getPredicateEqualsIdAndStatusActive(Integer developerId) {
+    private Predicate<Developer> getPredicateDeveloperIdEqualsIdAndStatusActive(Integer developerId) {
         return dev -> dev.getId().equals(developerId) && dev.getStatus().equals(Status.ACTIVE);
     }
 
-    private Predicate<Developer> getPredicateEqualsIdDeveloper(Integer developerId) {
+    private Predicate<Developer> getPredicateDeveloperIdEqualsId(Integer developerId) {
         return dev -> dev.getId().equals(developerId);
     }
 
-    private Consumer<Developer> getConsumerSetAllStatusDeleted() {
+    private Consumer<Developer> getConsumerSetDeletedStatusIfStatusEqualsActive() {
         return dev -> {
             if (dev.getStatus() == Status.ACTIVE)
                 dev.setStatus(Status.DELETED);
         };
     }
 
-    private Consumer<Developer> getConsumerSetStatusDeleted() {
+    private Consumer<Developer> getConsumerSetDeveloperDeletedStatus() {
         return dev -> dev.setStatus(Status.DELETED);
     }
 
@@ -228,7 +228,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
         };
     }
 
-    private Consumer<Developer> getConsumerAddSkill(Integer developerId, Skill skill) {
+    private Consumer<Developer> getConsumerAddSkillIfDevIdEqualsDevId(Integer developerId, Skill skill) {
         return dev -> {
             if (dev.getId().equals(developerId))
                 dev.getSkills().add(skill);
@@ -245,12 +245,12 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
         };
     }
 
-    private Predicate<Skill> getPredicateEqualsIdSkill(Integer skillId) {
+    private Predicate<Skill> getPredicateSkillIdEqualsId(Integer skillId) {
         return skill -> skill.getId().equals(skillId);
     }
 
-    private Consumer<Developer> getConsumerDeleteSkill(Integer skillId) {
-        return dev -> dev.getSkills().removeIf(getPredicateEqualsIdSkill(skillId));
+    private Consumer<Developer> getConsumerDeleteSkillIfSkillIdEqualsId(Integer skillId) {
+        return dev -> dev.getSkills().removeIf(getPredicateSkillIdEqualsId(skillId));
     }
 
     private Predicate<Developer> getPredicateIsUniqueSpecialityInDeveloper(Specialty specialty) {
@@ -270,11 +270,11 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
         };
     }
 
-    private Consumer<Developer> getConsumerDeleteSpecialty() {
+    private Consumer<Developer> getConsumerDeleteSpecialtySetNull() {
         return dev -> dev.setSpecialty(null);
     }
 
-    private Predicate<Developer> getPredicateFindBySpecialty(Integer developerId, Integer specialityId) {
+    private Predicate<Developer> getPredicateFilterSpecialtyIfDevIdEqualsIdAndSpecialtyIdEqualsId(Integer developerId, Integer specialityId) {
         return dev -> dev.getId().equals(developerId) && dev.getSpecialty().getId().equals(specialityId);
     }
 
@@ -288,27 +288,30 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
             }
         };
     }
-    private Consumer<Developer> getConsumerDeleteSkillIfActiveSetStatusDeletedIfDeleted(Integer skillId){
-        Predicate<Skill> setStatusDeleteIf = skill -> skill.getId().equals(skillId);
-        Consumer<Skill> setStatusDelete = skill -> {
+    private Consumer<Developer> getConsumerDeleteSkillIfActiveOrSetStatusDeletedIfStatusDeleted(Integer skillId){
+        return dev -> {
+            if (dev.getStatus().equals(Status.ACTIVE))
+                dev.getSkills().removeIf(getPredicateSkillIdEqualsId(skillId));
+            dev.getSkills().forEach(getConsumerIfSkillIdEqualsIdSetStatusDeleted(skillId));
+        };
+    }
+    private Consumer<Skill> getConsumerIfSkillIdEqualsIdSetStatusDeleted(Integer skillId){
+        return skill -> {
             if (skill.getId().equals(skillId))
                 skill.setStatus(Status.DELETED);
         };
-        return dev -> {
-            if (dev.getStatus().equals(Status.ACTIVE))
-                dev.getSkills().removeIf(setStatusDeleteIf);
-            dev.getSkills().forEach(setStatusDelete);
-        };
     }
     private Consumer<Developer> getConsumerDeleteAllSkillsActiveAndAllSetStatusDeletedIfDeleted(){
-        Consumer<Skill> setStatusDelete = skill -> skill.setStatus(Status.DELETED);
         return dev -> {
             if (dev.getStatus().equals(Status.ACTIVE))
                 dev.getSkills().removeAll(dev.getSkills());
-            dev.getSkills().forEach(setStatusDelete);
+            dev.getSkills().forEach(getConsumerSetSkillDeletedStatus());
         };
     }
-    private Consumer<Developer> getConsumerSetSpecialtyStatusDelete() {
+    private Consumer<Skill> getConsumerSetSkillDeletedStatus(){
+        return skill -> skill.setStatus(Status.DELETED);
+    }
+    private Consumer<Developer> getConsumerSetSpecialtyDeleteStatus() {
         return dev -> {
             if (dev.getStatus().equals(Status.ACTIVE)) {
                 dev.setSpecialty(null);
@@ -317,7 +320,7 @@ public class GsonDeveloperRepositoryImpl implements DeveloperRepository {
             }
         };
     }
-    private Predicate<Developer> getPredicateSpecialtyNonNullAndEqualsId(Integer specialtyId){
+    private Predicate<Developer> getPredicateSpecialtyIdNonNullAndEqualsId(Integer specialtyId){
         return dev -> dev.getSpecialty() != null &&
                 dev.getSpecialty().getId().equals(specialtyId);
     }

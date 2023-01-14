@@ -38,13 +38,13 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
 
     @Override
     public Skill findById(Integer id) {
-        return ParametrizeMethodsCrud.findById(getPredicateEqualsIdAndStatusActive(id), getSkills(), NOT_FOUND_SKILL);
+        return ParametrizeMethodsCrud.findById(getPredicateSkillIdEqualsIdAndStatusActive(id), getSkills(), NOT_FOUND_SKILL);
     }
 
     @Override
     public Skill update(Skill skill) {
         List<Skill> skills = getSkills();
-        ParametrizeMethodsCrud.update(skills, getPredicateEqualsId(skill.getId()), getConsumerSetName(skill), FILE);
+        ParametrizeMethodsCrud.update(skills, getPredicateSkillIdEqualsId(skill.getId()), getConsumerSkillSetName(skill), FILE);
         saveAll(skills);
         return skill;
     }
@@ -67,7 +67,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
     @Override
     public void deleteById(Integer id) {
         List<Skill> skills = getSkills();
-        ParametrizeMethodsCrud.deleteById(skills, getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDelete(), FILE);
+        ParametrizeMethodsCrud.deleteById(skills, getPredicateSkillIdEqualsIdAndStatusActive(id), getConsumerSkillSetDeleteStatus(), FILE);
         saveAll(skills);
     }
 
@@ -79,7 +79,7 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
     @Override
     public void deleteAll() {
         List<Skill> skills = getSkills();
-        ParametrizeMethodsCrud.deleteAll(skills, getConsumerSetStatusDeleteIfStatusActive(), FILE);
+        ParametrizeMethodsCrud.deleteAll(skills, getConsumerSkillSetDeleteStatusIfStatusActive(), FILE);
         saveAll(skills);
     }
 
@@ -100,26 +100,26 @@ public class GsonSkillRepositoryImpl implements SkillRepository {
         return this.findAll();
     }
 
-    private Predicate<Skill> getPredicateEqualsId(Integer skillId) {
+    private Predicate<Skill> getPredicateSkillIdEqualsId(Integer skillId) {
         return skill -> skill.getId().equals(skillId);
     }
 
-    private Predicate<Skill> getPredicateEqualsIdAndStatusActive(Integer skillId) {
+    private Predicate<Skill> getPredicateSkillIdEqualsIdAndStatusActive(Integer skillId) {
         return skill -> skill.getId().equals(skillId) && skill.getStatus().equals(Status.ACTIVE);
     }
 
-    private Consumer<Skill> getConsumerSetName(Skill skill) {
+    private Consumer<Skill> getConsumerSkillSetName(Skill skill) {
         return s -> {
             if (skill.getName() != null && !skill.getName().equals(s.getName()))
                 s.setName(skill.getName());
         };
     }
 
-    private Consumer<Skill> getConsumerSetStatusDelete() {
+    private Consumer<Skill> getConsumerSkillSetDeleteStatus() {
         return skill -> skill.setStatus(Status.DELETED);
     }
 
-    private Consumer<Skill> getConsumerSetStatusDeleteIfStatusActive() {
+    private Consumer<Skill> getConsumerSkillSetDeleteStatusIfStatusActive() {
         return skill -> {
             if (skill.getStatus() == Status.ACTIVE)
                 skill.setStatus(Status.DELETED);

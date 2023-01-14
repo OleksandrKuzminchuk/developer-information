@@ -39,7 +39,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     @Override
     public Specialty update(Specialty specialty) {
         List<Specialty> specialties = getSpecialties();
-        ParametrizeMethodsCrud.update(specialties, getPredicateEqualsIdSpecialty(specialty.getId()),
+        ParametrizeMethodsCrud.update(specialties, getPredicateSpecialtyIdEqualsId(specialty.getId()),
                 getConsumerUpdate(specialty), FILE);
         saveAll(specialties);
         return specialty;
@@ -47,7 +47,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
 
     @Override
     public Specialty findById(Integer id) {
-        return ParametrizeMethodsCrud.findById(getPredicateEqualsIdAndStatusActive(id), getSpecialties(), NOT_FOUND_SPECIALITY);
+        return ParametrizeMethodsCrud.findById(getPredicateSpecialtyIdEqualsIdAndStatusActive(id), getSpecialties(), NOT_FOUND_SPECIALITY);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     @Override
     public void deleteById(Integer id) {
         List<Specialty> specialties = getSpecialties();
-        ParametrizeMethodsCrud.deleteById(specialties, getPredicateEqualsIdAndStatusActive(id), getConsumerSetStatusDeleted(), FILE);
+        ParametrizeMethodsCrud.deleteById(specialties, getPredicateSpecialtyIdEqualsIdAndStatusActive(id), getConsumerSpecialtySetDeletedStatus(), FILE);
         saveAll(specialties);
     }
 
@@ -80,7 +80,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
     @Override
     public void deleteAll() {
         List<Specialty> specialties = getSpecialties();
-        ParametrizeMethodsCrud.deleteAll(specialties, getConsumerSetStatusDeletedIfEqualsActive(), FILE);
+        ParametrizeMethodsCrud.deleteAll(specialties, getConsumerSpecialtySetDeletedStatusIfEqualsActive(), FILE);
         saveAll(specialties);
     }
 
@@ -101,7 +101,7 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
         return this.findAll();
     }
 
-    private Predicate<Specialty> getPredicateEqualsIdSpecialty(Integer specialtyId) {
+    private Predicate<Specialty> getPredicateSpecialtyIdEqualsId(Integer specialtyId) {
         return specialty -> specialty.getId().equals(specialtyId);
     }
 
@@ -112,16 +112,16 @@ public class GsonSpecialtyRepositoryImpl implements SpecialtyRepository {
         };
     }
 
-    private Predicate<Specialty> getPredicateEqualsIdAndStatusActive(Integer specialtyId) {
+    private Predicate<Specialty> getPredicateSpecialtyIdEqualsIdAndStatusActive(Integer specialtyId) {
         return specialty -> specialty.getId().equals(specialtyId)
                 && specialty.getStatus().equals(Status.ACTIVE);
     }
 
-    private Consumer<Specialty> getConsumerSetStatusDeleted() {
+    private Consumer<Specialty> getConsumerSpecialtySetDeletedStatus() {
         return specialty -> specialty.setStatus(Status.DELETED);
     }
 
-    private Consumer<Specialty> getConsumerSetStatusDeletedIfEqualsActive() {
+    private Consumer<Specialty> getConsumerSpecialtySetDeletedStatusIfEqualsActive() {
         return specialty -> {
             if (specialty.getStatus() == Status.ACTIVE)
                 specialty.setStatus(Status.DELETED);

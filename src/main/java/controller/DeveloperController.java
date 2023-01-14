@@ -10,7 +10,6 @@ import repository.SpecialtyRepository;
 
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
 import static util.Constants.*;
 
 public class DeveloperController {
@@ -73,8 +72,6 @@ public class DeveloperController {
     }
 
     public String deleteSpecialty(Integer developerId, Integer specialityId) {
-        requireNonNull(developerId);
-        requireNonNull(specialityId);
         repository.existsById(developerId);
         specialtyRepository.existsById(specialityId);
         repository.deleteSpecialty(developerId, specialityId);

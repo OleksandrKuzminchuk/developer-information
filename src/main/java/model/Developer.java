@@ -1,6 +1,5 @@
 package model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,14 +10,41 @@ public class Developer {
     private List<Skill> skills;
     private Specialty specialty;
     private Status status;
+
     public Developer() {
+    }
+
+    public Developer(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public Developer(Integer id, String firstName, String lastName) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.skills = new ArrayList<>();
+    }
+
+    public Developer(Integer id, String firstName, String lastName, Specialty specialty) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.specialty = specialty;
+    }
+
+    public Developer(Integer id, String firstName, String lastName, List<Skill> skills, Specialty specialty) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.skills = skills;
+        this.specialty = specialty;
+    }
+
+    public Developer(Integer id, String firstName, String lastName, Status status) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.status = status;
     }
 
     public Integer getId() {

@@ -1,21 +1,15 @@
-Необходимо реализовать консольное CRUD приложение, которое имеет следующие сущности:
-
+Необходимо реализовать консольное CRUD приложение, которое взаимодействует с БД и позволяет выполнять все CRUD операции над сущностями:
 Developer (id, firstName, lastName, List<Skill> skills, Specialty specialty)
 Skill
 Specialty
 Status (enum ACTIVE, DELETED)
-
-Developer -> List<Skill> skills + Specialty specialty
-Каждая сущность имеет поле Status. В момент удаления, мы не удаляем запись из файла, а меняем её статус на DELETED.
-
-В качестве хранилища данных необходимо использовать текстовые файлы:
-developers.json, skills.json, specialties.json
-
-Пользователь в консоли должен иметь возможность создания, получения, редактирования и удаления данных.
-
+Требования:
+Придерживаться шаблона MVC (пакеты model, repository, service, controller, view)
+Для миграции БД использовать https://www.liquibase.org/
+Сервисный слой приложения должен быть покрыт юнит тестами (junit + mockito).
 Слои:
 model - POJO клаcсы
-repository - классы, реализующие доступ к текстовым файлам
+repository - классы, реализующие доступ к базе данных MySql
 controller - обработка запросов от пользователя
 view - все данные, необходимые для работы с консолью
 
@@ -29,9 +23,9 @@ interface GenericRepository<T,ID>
 
 interface DeveloperRepository extends GenericRepository<Developer, Long>
 
-class GsonDeveloperRepositoryImpl implements DeveloperRepository
+class JdbcDeveloperRepositoryImpl implements DeveloperRepository
 
-Для работы с json необходимо использовать библиотеку Gson(https://mvnrepository.com/artifact/com.google.code.gson/gson)
-Для импорта зависимостей - Maven/Gradle на выбор.
+Для импорта библиотек использовать Maven
+Результатом выполнения проекта должен быть отдельный репозиторий на github, с описанием задачи, проекта и инструкцией по локальному запуску проекта.
 
-Результатом выполнения задания должен быть отдельный репозиторий с README.md файлом, который содержит описание задачи, проекта.
+Технологии: Java, MySQL, JDBC, Maven, Liquibase, JUnit, Mockito

@@ -9,14 +9,19 @@ public class Skill {
 
     public Skill() {
     }
-
-    public Skill(Integer id) {
-        this.id = id;
+    public Skill(String name) {
+        this.name = name;
     }
 
-    public Skill(Integer id, String skill) {
+    public Skill(Integer id, String name) {
         this.id = id;
-        this.name = skill;
+        this.name = name;
+    }
+
+    public Skill(Integer id, String name, Status status) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
     }
 
     public Integer getId() {

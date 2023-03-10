@@ -1,6 +1,0 @@
-[{"id":1,"firstName":"fd","lastName":"fd","skills":[{"id":1,"name":"sdsd","status":"ACTIVE"}],"specialty":{"id":1,"name":"dsd","status":"ACTIVE"},
-"status":"DELETED"},
-{"id":2,"firstName":"sa","lastName":"sa","skills":[{"id":1,"name":"sdsd","status":"ACTIVE"}],"specialty":{"id":1,"name":"dsd","status":"ACTIVE"},
-"status":"ACTIVE"},
-{"id":3,"firstName":"ddsd","lastName":"ds","skills":[{"id":1,"name":"sdsd","status":"ACTIVE"},
-{"id":2,"name":"ds","status":"ACTIVE"}],"status":"ACTIVE"}]

@@ -1,49 +1,44 @@
 package controller;
 
 import model.Specialty;
-import repository.DeveloperRepository;
-import repository.SpecialtyRepository;
+import service.SpecialtyService;
 
 import java.util.List;
 
-import static util.Constants.*;
+import static util.constant.Constants.*;
 
 public class SpecialtyController {
-    private final SpecialtyRepository repository;
-    private final DeveloperRepository developerRepository;
+    private final SpecialtyService service;
 
-    public SpecialtyController(SpecialtyRepository repository, DeveloperRepository developerRepository) {
-        this.repository = repository;
-        this.developerRepository = developerRepository;
+    public SpecialtyController(SpecialtyService service) {
+        this.service = service;
     }
 
     public Specialty save(Specialty specialty) {
-        return repository.save(specialty);
+        return service.save(specialty);
     }
 
     public Specialty update(Specialty specialty) {
-        repository.existsById(specialty.getId());
-        return repository.update(specialty);
+        return service.update(specialty);
     }
 
     public Specialty findById(Integer id) {
-        return repository.findById(id);
+        return service.findById(id);
     }
 
     public List<Specialty> findAll() {
-        return repository.findAll();
+        return service.findAll();
     }
 
     public String deleteById(Integer id) {
-        repository.existsById(id);
-        repository.deleteById(id);
-        developerRepository.deleteSpecialtyByIdOrSetSpecialtyStatusDeleteIfNonNullAndEqualsId(id);
+        service.deleteById(id);
+//        developerService.deleteSpecialtyByIdOrSetSpecialtyStatusDeleteIfNonNullAndEqualsId(id);
         return RESPONSE_OK;
     }
 
     public String deleteAll() {
-        repository.deleteAll();
-        developerRepository.deleteAllSpecialtyOrSetSpecialtyStatusDeletedIfStatusDeleted();
+        service.deleteAll();
+//        developerService.deleteAllSpecialtyOrSetSpecialtyStatusDeletedIfStatusDeleted();
         return RESPONSE_OK;
     }
 }

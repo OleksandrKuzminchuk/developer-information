@@ -5,13 +5,13 @@ import exception.NotFoundException;
 import exception.NotValidException;
 import model.Developer;
 import model.Skill;
-import model.Specialty;
 
 import java.util.Comparator;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
-import static util.Constants.*;
+import static util.constant.Constants.*;
 
 public class DeveloperView {
     private final DeveloperController controller;
@@ -24,14 +24,11 @@ public class DeveloperView {
 
     public void save() {
         try {
-            System.out.println(TEXT_INPUT_ID);
-            Integer id = scanner.nextInt();
-            scanner.nextLine();
             System.out.println(TEXT_INPUT_NAME);
             String firstName = scanner.nextLine();
             System.out.println(TEXT_INPUT_SURNAME);
             String lasName = scanner.nextLine();
-            Developer saved = controller.save(new Developer(id, firstName, lasName));
+            Developer saved = controller.save(new Developer(firstName, lasName));
             System.out.println(saved + TEXT_SAVE_SUCCESSFULLY);
             scanner.reset();
         } catch (IllegalArgumentException e) {
@@ -56,10 +53,15 @@ public class DeveloperView {
     }
 
     public void findAll() {
-        Comparator<Developer> sortById = Comparator.comparingInt(Developer::getId);
-        controller.findAll().stream()
-                .sorted(sortById)
-                .forEach(developer -> System.out.print(developer + "\n"));
+        List<Developer> developers = controller.findAll();
+        if (!developers.isEmpty()) {
+            Comparator<Developer> sortById = Comparator.comparingInt(Developer::getId);
+            controller.findAll().stream()
+                    .sorted(sortById)
+                    .forEach(developer -> System.out.print(developer + "\n"));
+        } else {
+            System.out.println(EMPTY_LIST);
+        }
     }
 
     public void update() {
@@ -108,8 +110,8 @@ public class DeveloperView {
             System.out.println(TEXT_INPUT_SKILL_ID);
             Integer skillId = scanner.nextInt();
             scanner.nextLine();
-            Skill skill = controller.addSkill(developerId, skillId);
-            System.out.println(skill + TEXT_ADDED_SUCCESSFULLY);
+            controller.addSkill(developerId, skillId);
+            System.out.println(TEXT_ADDED_SUCCESSFULLY);
         } catch (NotFoundException | NotValidException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
@@ -142,8 +144,8 @@ public class DeveloperView {
             System.out.println(TEXT_INPUT_SPECIALITY_ID);
             Integer specialityId = scanner.nextInt();
             scanner.nextLine();
-            Specialty specialty = controller.addSpecialty(developerId, specialityId);
-            System.out.println(specialty + TEXT_ADDED_SUCCESSFULLY);
+            controller.addSpecialty(developerId, specialityId);
+            System.out.println(TEXT_ADDED_SUCCESSFULLY);
         } catch (NotValidException | NotFoundException e) {
             System.out.println(e.getMessage());
         } catch (InputMismatchException e) {
@@ -156,10 +158,7 @@ public class DeveloperView {
             System.out.println(TEXT_INPUT_DEVELOPER_ID);
             Integer developerId = scanner.nextInt();
             scanner.nextLine();
-            System.out.println(TEXT_INPUT_SPECIALITY_ID);
-            Integer specialityId = scanner.nextInt();
-            scanner.nextLine();
-            String deleted = controller.deleteSpecialty(developerId, specialityId);
+            String deleted = controller.deleteSpecialty(developerId);
             System.out.println(deleted);
         } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
@@ -173,10 +172,15 @@ public class DeveloperView {
             System.out.println(TEXT_INPUT_ID);
             Integer id = scanner.nextInt();
             scanner.nextLine();
-            Comparator<Skill> sortById = Comparator.comparing(Skill::getId);
-            controller.findSkillsByDeveloperId(id).stream()
-                    .sorted(sortById)
-                    .forEach(skill -> System.out.print(skill + "\n"));
+            List<Skill> skills = controller.findSkillsByDeveloperId(id);
+            if (skills != null) {
+                Comparator<Skill> sortById = Comparator.comparing(Skill::getId);
+                controller.findSkillsByDeveloperId(id).stream()
+                        .sorted(sortById)
+                        .forEach(skill -> System.out.print(skill + "\n"));
+            } else {
+                System.out.println(EMPTY_LIST);
+            }
         } catch (InputMismatchException e) {
             System.out.println(EXCEPTION_MISMATCH);
         } catch (NotFoundException e) {

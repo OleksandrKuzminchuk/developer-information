@@ -1,0 +1,58 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.10.xsd">
+    <changeSet id="create-tables-developers-information" author="oleksandr-kuzminchuk">
+        <createTable tableName="developer">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="specialty_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="skill">
+            <column name="id" type="BIGINT" autoIncrement="true ">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="developer_skill">
+            <column name="developer_id" type="BIGINT">
+                <constraints nullable="true" primaryKey="false" foreignKeyName="developer_skill_fk1" referencedTableName="developer" referencedColumnNames="id"/>
+            </column>
+            <column name="skill_id" type="BIGINT">
+                <constraints nullable="true" primaryKey="false" foreignKeyName="developer_skill_fk2" referencedTableName="skill" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="specialty">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+</databaseChangeLog>

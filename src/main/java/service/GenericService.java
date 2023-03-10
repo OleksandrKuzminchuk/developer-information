@@ -1,13 +1,12 @@
-package repository;
+package service;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface GenericRepository<T, ID> {
+public interface GenericService<T, ID> {
     T save(T entity);
     void saveAll(List<T> entities);
     T update(T entity);
-    Optional<T> findById(ID id);
+    T findById(ID id);
     boolean existsById(ID id);
     List<T> findAll();
     Long count();

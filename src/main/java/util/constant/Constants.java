@@ -1,26 +1,15 @@
-package util;
+package util.constant;
 
-public class Constants {
+public final class Constants {
     private Constants() {
         throw new IllegalStateException("Utility class");
     }
-    public static final String FILE_DEVELOPERS_PATH = "C:\\Users\\Kuzminchuk_Alexandr\\IdeaProjects\\developer-information\\src\\main\\resources\\db\\developers.json";
-    public static final String FILE_SKILLS_PATH = "C:\\Users\\Kuzminchuk_Alexandr\\IdeaProjects\\developer-information\\src\\main\\resources\\db\\skills.json";
-    public static final String FILE_SPECIALTIES_PATH = "C:\\Users\\Kuzminchuk_Alexandr\\IdeaProjects\\developer-information\\src\\main\\resources\\db\\specialties.json";
+    public static final String CHANGELOG_FILE = "changelog.xml";
+    public static final String PROPERTIES_FILE = "db.properties";
     public static final String NOT_FOUND_DEVELOPER = "Can't find a developer or a developer has been delete or the Id is already taken";
     public static final String NOT_FOUND_SKILL = "Can't find a skill or a skill has been delete or the Id is already taken";
     public static final String NOT_FOUND_SPECIALITY = "Can't find a speciality or a speciality has been delete or the Id is already taken";
-    public static final String NOT_IMPLEMENTED_COUNT = "The method 'count' not implemented";
-    public static final String NOT_IMPLEMENTED_DELETE = "The method 'delete' not implemented";
-    public static final String DEVELOPER_HAS_SKILL = "The developer already has the skill";
-    public static final String DEVELOPER_HAS_NOT_SKILL = "The developer has not the skill";
-    public static final String DEVELOPER_HAS_SPECIALITY = "The developer already has the speciality";
-    public static final String DEVELOPER_HAS_NOT_SPECIALITY = "The developer has not the speciality";
     public static final String RESPONSE_OK = "SUCCESSFULLY";
-    public static final String ERROR_IO = "Error input-output or Parse Json: ";
-    public static final String EXCEPTION_DEVELOPER_HAS_ALREADY_TAKEN = "Developer has already taken by id - %d";
-    public static final String EXCEPTION_SKILL_HAS_ALREADY_TAKEN = "Skill has already taken by id - %d";
-    public static final String EXCEPTION_SPECIALTY_HAS_ALREADY_TAKEN = "Speciality has already taken by id - %d";
     public static final String TEXT_INPUT_ID = "Please, input id";
     public static final String TEXT_INPUT_NAME = "Please, input name";
     public static final String TEXT_INPUT_NEW_NAME = "Please, input new name";
@@ -29,7 +18,6 @@ public class Constants {
     public static final String TEXT_SAVE_SUCCESSFULLY = " SAVED SUCCESSFULLY";
     public static final String TEXT_UPDATED_SUCCESSFULLY = " UPDATED SUCCESSFULLY";
     public static final String TEXT_ADDED_SUCCESSFULLY = " ADDED SUCCESSFULLY";
-    public static final String NOT_NULL = "Can not be 'null': ";
     public static final String TEXT_INPUT_DEVELOPER_ID = "Please, input Developer - id";
     public static final String TEXT_INPUT_SKILL_ID = "Please, input Skill - id";
     public static final String TEXT_INPUT_SPECIALITY_ID = "Please, input Speciality - id";
@@ -68,4 +56,29 @@ public class Constants {
     public static final String SPECIALTIES_DELETE_ALL = "specialties/delete/all";
     public static final String EXCEPTION_MISMATCH = "Id must be a number";
     public static final String EMPTY_LIST = "List is empty";
+    public static final String FAILED_TO_SAVE_A_SPECIALTY = "Failed to save a specialty: ";
+    public static final String FAILED_TO_UPDATE_A_SPECIALTY_BY_ID = "Failed to update a specialty by id - [%d]: ";
+    public static final String FAILED_TO_FIND_A_SPECIALTY_BY_ID = "Failed to find a specialty by id - [%d]: ";
+    public static final String FAILED_TO_EXISTS_SPECIALTY_BY_ID = "Failed to exists specialty by id - [%d]";
+    public static final String FAILED_TO_FIND_ALL_SPECIALTIES = "Failed to find all specialties: ";
+    public static final String FAILED_TO_DELETE_A_SPECIALTY_BY_ID = "Failed to delete a specialty by id - [%d]: ";
+    public static final String FAILED_TO_DELETE_ALL_SPECIALTIES = "Failed to delete all specialties: ";
+    public static final String FAILED_TO_SAVE_DEVELOPER = "Failed to save developer: ";
+    public static final String FAILED_TO_UPDATE_DEVELOPER = "Failed to update developer: ";
+    public static final String FAILED_TO_FIND_DEVELOPER_BY_ID = "Failed to find developer by id - [%d]";
+    public static final String FAILED_TO_CHECK_IF_DEVELOPER_EXISTS_BY_ID = "Failed to check if developer exists by id - [%d]: ";
+    public static final String FAILED_TO_FIND_ALL_DEVELOPERS = "Failed to find all developers: ";
+    public static final String FAILED_TO_DELETE_DEVELOPER_BY_ID = "Failed to delete developer by id - [%d]: ";
+    public static final String FAILED_TO_DELETE_ALL_DEVELOPERS = "Failed to delete all developers: ";
+    public static final String FAILED_TO_ADD_SKILL_BY_ID = "Failed to add skill by id - [%d] to developer by id - [%d]: ";
+    public static final String FAILED_TO_DELETE_SKILL_FROM_DEVELOPER = "Failed to delete skill by id - [%d] from developer by id - [%d]: ";
+    public static final String FAILED_TO_ADD_SPECIALTY_BY_ID = "Failed to add specialty by id - [%d] to developer by id - [%d]: ";
+    public static final String FAILED_TO_DELETE_SPECIALTY_FROM_DEVELOPER_BY_ID = "Failed to delete specialty from developer by id - [%d]: ";
+    public static final String FAILED_TO_SAVE_SKILL = "Failed to save skill: ";
+    public static final String FAILED_TO_UPDATE_SKILL_BY_ID = "Failed to update a skill by id - [%d]: ";
+    public static final String FAILED_TO_FIND_SKILL_BY_ID = "Failed to find a skill by id - [%d]: ";
+    public static final String FAILED_TO_EXISTS_SKILL_BY_ID = "Failed to exists a skill by id - [%d]: ";
+    public static final String FAILED_TO_FIND_ALL_SKILLS = "Faied to find all skills: ";
+    public static final String FAILED_TO_DELETE_SKILL_BY_ID = "Failed to delete skill by id - [%d]: ";
+    public static final String FAILED_TO_DELETE_ALL_SKILLS = "Failed to delete all skills: ";
 }

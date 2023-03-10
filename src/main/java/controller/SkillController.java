@@ -2,48 +2,45 @@ package controller;
 
 import model.Skill;
 import repository.DeveloperRepository;
-import repository.SkillRepository;
+import service.DeveloperService;
+import service.SkillService;
 
 import java.util.List;
 
-import static util.Constants.*;
+import static util.constant.Constants.*;
 
 public class SkillController {
-    private final SkillRepository repository;
-    private final DeveloperRepository developerRepository;
+    private final SkillService service;
 
-    public SkillController(SkillRepository skillRepository, DeveloperRepository developerRepository) {
-        this.repository = skillRepository;
-        this.developerRepository = developerRepository;
+    public SkillController(SkillService service) {
+        this.service = service;
     }
 
     public Skill save(Skill skill) {
-        return repository.save(skill);
+        return service.save(skill);
     }
 
     public Skill findById(Integer id) {
-        return repository.findById(id);
+        return service.findById(id);
     }
 
     public Skill update(Skill skill) {
-        repository.existsById(skill.getId());
-        return repository.update(skill);
+        return service.update(skill);
     }
 
     public List<Skill> findAll() {
-        return repository.findAll();
+        return service.findAll();
     }
 
     public String deleteById(Integer id) {
-        repository.existsById(id);
-        repository.deleteById(id);
-        developerRepository.deleteSkillByIdIfActiveOrSetStatusDeletedIfDeleted(id);
+        service.deleteById(id);
+//        developerService.deleteSkillByIdIfActiveOrSetStatusDeletedIfDeleted(id);
         return RESPONSE_OK;
     }
 
     public String deleteAll() {
-        repository.deleteAll();
-        developerRepository.deleteAllSkillsActiveOrAllSetStatusDeletedIfDeleted();
+        service.deleteAll();
+//        developerService.deleteAllSkillsActiveOrAllSetStatusDeletedIfDeleted();
         return RESPONSE_OK;
     }
 }

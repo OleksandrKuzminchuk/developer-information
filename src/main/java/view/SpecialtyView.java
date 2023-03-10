@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import static util.Constants.*;
+import static util.constant.Constants.*;
 
 public class SpecialtyView {
     private final SpecialtyController controller;
@@ -22,12 +22,9 @@ public class SpecialtyView {
 
     public void save() {
         try {
-            System.out.println(TEXT_INPUT_ID);
-            Integer id = scanner.nextInt();
-            scanner.nextLine();
             System.out.println(TEXT_INPUT_NAME);
             String name = scanner.nextLine();
-            Specialty saved = controller.save(new Specialty(id, name));
+            Specialty saved = controller.save(new Specialty(name));
             System.out.println(saved + TEXT_SAVE_SUCCESSFULLY);
             scanner.reset();
         } catch (InputMismatchException e) {

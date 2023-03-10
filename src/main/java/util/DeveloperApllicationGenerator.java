@@ -6,16 +6,21 @@ import controller.SpecialtyController;
 import repository.DeveloperRepository;
 import repository.SkillRepository;
 import repository.SpecialtyRepository;
-import repository.impl.GsonDeveloperRepositoryImpl;
-import repository.impl.GsonSkillRepositoryImpl;
-import repository.impl.GsonSpecialtyRepositoryImpl;
+import repository.impl.*;
+import service.DeveloperService;
+import service.SkillService;
+import service.SpecialtyService;
+import service.impl.DeveloperServiceImpl;
+import service.impl.SkillServiceImpl;
+import service.impl.SpecialtyServiceImpl;
 import view.DeveloperView;
 import view.SkillView;
 import view.SpecialtyView;
 
 import java.util.Scanner;
 
-import static util.Constants.*;
+import static util.LiquibaseMigration.migrate;
+import static util.constant.Constants.*;
 
 public class DeveloperApllicationGenerator implements Runnable{
     private final DeveloperView developerView;
@@ -23,12 +28,15 @@ public class DeveloperApllicationGenerator implements Runnable{
     private final SpecialtyView specialtyView;
     private static final Scanner SCANNER = new Scanner(System.in);
     public DeveloperApllicationGenerator() {
-        DeveloperRepository developerRepository = new GsonDeveloperRepositoryImpl();
-        SkillRepository skillRepository = new GsonSkillRepositoryImpl();
-        SpecialtyRepository specialtyRepository = new GsonSpecialtyRepositoryImpl();
-        DeveloperController developerController = new DeveloperController(developerRepository, skillRepository, specialtyRepository);
-        SkillController skillController = new SkillController(skillRepository, developerRepository);
-        SpecialtyController specialtyController = new SpecialtyController(specialtyRepository, developerRepository);
+        SkillRepository skillRepository = new SkillRepositoryImpl();
+        SpecialtyRepository specialtyRepository = new SpecialtyRepositoryImpl();
+        DeveloperRepository developerRepository = new DeveloperRepositoryImpl();
+        SkillService skillService = new SkillServiceImpl(skillRepository);
+        SpecialtyService specialtyService = new SpecialtyServiceImpl(specialtyRepository);
+        DeveloperService developerService = new DeveloperServiceImpl(developerRepository, specialtyRepository, skillRepository);
+        SkillController skillController = new SkillController(skillService);
+        SpecialtyController specialtyController = new SpecialtyController(specialtyService);
+        DeveloperController developerController = new DeveloperController(developerService);
         this.developerView = new DeveloperView(developerController, SCANNER);
         this.skillView = new SkillView(skillController, SCANNER);
         this.specialtyView = new SpecialtyView(specialtyController, SCANNER);
@@ -36,6 +44,7 @@ public class DeveloperApllicationGenerator implements Runnable{
 
     @Override
     public void run() {
+        migrate();
         System.out.println(DESCRIBE_APPLICATION);
         String userInput = "";
         while (!userInput.equals("stop")) {

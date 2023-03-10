@@ -16,6 +16,16 @@ public class Specialty {
         this.name = name;
     }
 
+    public Specialty(Integer id, String name, Status status) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+    }
+
+    public Specialty(String name) {
+        this.name = name;
+    }
+
     public Integer getId() {
         return id;
     }

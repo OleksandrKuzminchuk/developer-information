@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import static util.Constants.*;
+import static util.constant.Constants.*;
 
 public class SkillView {
     private final SkillController controller;
@@ -21,12 +21,9 @@ public class SkillView {
 
     public void save() {
         try {
-            System.out.println(TEXT_INPUT_ID);
-            Integer id = scanner.nextInt();
-            scanner.nextLine();
             System.out.println(TEXT_INPUT_NAME);
             String name = scanner.nextLine();
-            Skill saved = controller.save(new Skill(id, name));
+            Skill saved = controller.save(new Skill(name));
             System.out.println(saved + TEXT_SAVE_SUCCESSFULLY);
             scanner.reset();
         } catch (InputMismatchException e) {

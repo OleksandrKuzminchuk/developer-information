@@ -4,14 +4,14 @@ Skill
 Specialty
 Status (enum ACTIVE, DELETED)
 Требования:
-Придерживаться шаблона MVC (пакеты model, repository, service, controller, view)
+Придерживаться шаблона MVC (пакеты com.sasha.jdbccrud.model, com.sasha.jdbccrud.repository, com.sasha.jdbccrud.service, com.sasha.jdbccrud.controller, com.sasha.jdbccrud.view)
 Для миграции БД использовать https://www.liquibase.org/
 Сервисный слой приложения должен быть покрыт юнит тестами (junit + mockito).
 Слои:
-model - POJO клаcсы
-repository - классы, реализующие доступ к базе данных MySql
-controller - обработка запросов от пользователя
-view - все данные, необходимые для работы с консолью
+com.sasha.jdbccrud.model - POJO клаcсы
+com.sasha.jdbccrud.repository - классы, реализующие доступ к базе данных MySql
+com.sasha.jdbccrud.controller - обработка запросов от пользователя
+com.sasha.jdbccrud.view - все данные, необходимые для работы с консолью
 
 
 

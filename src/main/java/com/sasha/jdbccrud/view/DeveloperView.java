@@ -1,42 +1,37 @@
 package com.sasha.jdbccrud.view;
 
 import com.sasha.jdbccrud.controller.DeveloperController;
+import com.sasha.jdbccrud.controller.SkillController;
+import com.sasha.jdbccrud.controller.SpecialtyController;
 import com.sasha.jdbccrud.exception.NotFoundException;
 import com.sasha.jdbccrud.model.Developer;
 import com.sasha.jdbccrud.model.Skill;
 import com.sasha.jdbccrud.model.Specialty;
 import com.sasha.jdbccrud.model.Status;
 
-import java.util.Comparator;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static com.sasha.jdbccrud.util.constant.Constants.*;
 
 public class DeveloperView {
     private final DeveloperController controller;
+    private final SkillController skillController;
+    private final SpecialtyController specialtyController;
     private final Scanner scanner;
 
-    public DeveloperView(DeveloperController developerController, Scanner scanner) {
-        this.controller = developerController;
+    public DeveloperView(DeveloperController controller, SkillController skillController, SpecialtyController specialtyController, Scanner scanner) {
+        this.controller = controller;
+        this.skillController = skillController;
+        this.specialtyController = specialtyController;
         this.scanner = scanner;
     }
 
     public void save() {
         try {
-            System.out.println(TEXT_INPUT_NAME);
-            String firstName = scanner.nextLine();
-            System.out.println(TEXT_INPUT_SURNAME);
-            String lasName = scanner.nextLine();
-            System.out.println(TEXT_INPUT_SPECIALITY_ID);
-            Integer specialityId = scanner.nextInt();
-            System.out.println(TEXT_INPUT_SKILL_ID);
-            Integer skillId = scanner.nextInt();
-            scanner.nextLine();
-            Developer saveDeveloper = new Developer(firstName, lasName);
-            setSpecialtyIfSpecialtyIdNotZero(specialityId, saveDeveloper);
-            setSkillIfSkillIdNotZero(skillId, saveDeveloper);
+            Developer saveDeveloper = new Developer();
+            setFirstNameLastNameToUpdateFromConsole(saveDeveloper);
+            saveDeveloper.setSpecialty(setSpecialtyToUpdateFromConsole(saveDeveloper));
+            saveDeveloper.setSkills(getSkillsToUpdateFromConsole(saveDeveloper));
             Developer savedDeveloper = controller.save(saveDeveloper);
             System.out.println(savedDeveloper + TEXT_SAVE_SUCCESSFULLY);
             scanner.reset();
@@ -73,59 +68,16 @@ public class DeveloperView {
         }
     }
 
-    //TODO: Help me
     public void update() {
         try {
             System.out.println(TEXT_INPUT_ID);
             Integer updateId = scanner.nextInt();
             scanner.nextLine();
-            System.out.println(TEXT_INPUT_NEW_NAME);
-            String newFirstName = scanner.nextLine();
-            System.out.println(TEXT_INPUT_NEW_SURNAME);
-            String newLastName = scanner.nextLine();
-            System.out.println(TEXT_INPUT_SPECIALITY_ID);
-            Integer newSpecialityId = scanner.nextInt();
-            System.out.println(TEXT_INPUT_SKILL_ID);
-            Integer newSkillId = scanner.nextInt();
-
-            System.out.println(TEXT_INPUT_SPECIALITY_ID);
-            Integer deleteSpecialityId = scanner.nextInt();
-            System.out.println(TEXT_INPUT_SKILL_ID);
-            Integer deleteSkillId = scanner.nextInt();
-
             Developer updateDeveloper = controller.findById(updateId);
-
             if (updateDeveloper.getStatus().equals(Status.ACTIVE)) {
-                if (!updateDeveloper.getFirstName().equals(newFirstName)) {
-                    updateDeveloper.setFirstName(newFirstName);
-                }
-
-                if (!updateDeveloper.getLastName().equals(newLastName)) {
-                    updateDeveloper.setLastName(newLastName);
-                }
-
-                if (newSpecialityId != 0) {
-                    updateDeveloper.setSpecialty(new Specialty(newSpecialityId));
-                } else if (deleteSpecialityId != 0) {
-                    updateDeveloper.setSpecialty(null);
-                }
-
-                if (updateDeveloper.getSkills() != null) {
-                    updateDeveloper.getSkills().removeIf(skill -> (deleteSkillId != 0 && deleteSkillId.equals(skill.getId())));
-                } else {
-                    updateDeveloper.addSkillToDeveloper(new Skill(newSkillId));
-                }
-
-                if (updateDeveloper.getSkills() != null){
-                    if (newSkillId != 0) {
-                        updateDeveloper.getSkills().forEach(skill ->
-                        {
-                            if (!skill.getId().equals(newSkillId)) {
-                                updateDeveloper.addSkillToDeveloper(new Skill(newSkillId));
-                            }
-                        });
-                    }
-                }
+                setFirstNameLastNameToUpdateFromConsole(updateDeveloper);
+                updateDeveloper.setSpecialty(setSpecialtyToUpdateFromConsole(updateDeveloper));
+                updateDeveloper.setSkills(getSkillsToUpdateFromConsole(updateDeveloper));
             } else {
                 throw new NotFoundException(NOT_FOUND_DEVELOPER);
             }
@@ -179,15 +131,68 @@ public class DeveloperView {
         }
     }
 
-    private static void setSpecialtyIfSpecialtyIdNotZero(Integer specialityId, Developer developer) {
-        if (specialityId != 0) {
-            developer.setSpecialty(new Specialty(specialityId));
+    private void setFirstNameLastNameToUpdateFromConsole(Developer developer){
+        System.out.println(TEXT_INPUT_NEW_NAME);
+        String newFirstName = scanner.nextLine();
+        if ((developer.getFirstName() == null && !Objects.equals(newFirstName, "0")) || (!developer.getFirstName().equals(newFirstName) && !Objects.equals(newFirstName, "0"))) {
+            developer.setFirstName(newFirstName);
+        }
+        System.out.println(TEXT_INPUT_NEW_SURNAME);
+        String newLastName = scanner.nextLine();
+        if ((developer.getLastName() == null && !Objects.equals(newLastName, "0")) || (!developer.getLastName().equals(newLastName) && !Objects.equals(newLastName, "0"))) {
+            developer.setLastName(newLastName);
         }
     }
 
-    private static void setSkillIfSkillIdNotZero(Integer skillId, Developer developer) {
-        if (skillId != 0) {
-            developer.addSkillToDeveloper(new Skill(skillId));
+    private List<Skill> getSkillsToUpdateFromConsole(Developer developer) {
+        List<Skill> allSkills = skillController.findAll();
+        List<Skill> result = new ArrayList<>();
+        allSkills.removeIf(currentSkill -> developer.getSkills() != null && developer.getSkills().contains(currentSkill));
+
+        System.out.println(TEXT_INPUT_SKILL_ID);
+
+        Integer selectedId = scanner.nextInt();
+
+        while (selectedId != -1) {
+            Integer finalSelectedId = selectedId;
+            Skill skillToAdd = allSkills.stream().filter(s -> s.getId().equals(finalSelectedId)).findFirst().orElse(null);
+
+            if(skillToAdd != null) {
+                result.add(skillToAdd);
+                allSkills.remove(skillToAdd);
+            }
+
+            System.out.println(skillToAdd);
+            selectedId = scanner.nextInt();
         }
+        return result;
+    }
+
+    private Specialty setSpecialtyToUpdateFromConsole(Developer developer){
+        List<Specialty> specialties = specialtyController.findAll();
+        Specialty result = new Specialty();
+
+        specialties.removeIf(specialty -> developer.getSpecialty() != null && developer.getSpecialty().equals(specialty));
+
+        System.out.println(TEXT_INPUT_SPECIALITY_ID);
+        Integer specialityId = scanner.nextInt();
+
+        if (specialityId != 0) {
+            while (specialityId != -1) {
+                Integer finalSelectedId = specialityId;
+                Specialty specialtyToAdd = specialties.stream().filter(specialty -> specialty.getId().equals(finalSelectedId)).findFirst().orElse(null);
+                if (specialtyToAdd != null) {
+                    result.setId(specialtyToAdd.getId());
+                    result.setName(specialtyToAdd.getName());
+                    result.setStatus(specialtyToAdd.getStatus());
+                }
+
+                System.out.println(specialtyToAdd);
+                specialityId = scanner.nextInt();
+            }
+        }else {
+            return null;
+        }
+        return result;
     }
 }

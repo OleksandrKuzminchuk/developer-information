@@ -36,44 +36,47 @@ class SpecialtyServiceImplTest {
         Mockito.reset(repository);
     }
 
-//    @Test
-//    void shouldSaveSpecialty() {
-//        when(repository.save(argThat(specialty -> specialty.equals(expectedSpecialtyWithName) && specialty.getName().equals(expectedSpecialtyWithName.getName()))))
-//                .thenReturn(expectedSpecialtyWithName);
-//
-//        Specialty savedSpecialty = service.save(expectedSpecialtyWithName);
-//
-//        assertNotNull(savedSpecialty);
-//        assertEquals(expectedSpecialtyWithName, savedSpecialty);
-//
-//        verify(repository, atLeastOnce())
-//                .save(argThat(specialty -> specialty.equals(expectedSpecialtyWithName) && specialty.getName().equals(expectedSpecialtyWithName.getName())));
-//    }
+    @Test
+    void shouldSaveSpecialty() {
+        Specialty expectedAfterSave = expectedSpecialtyWithName;
+        expectedAfterSave.setId(1);
+        when(repository.save(argThat(specialty -> specialty.equals(expectedSpecialtyWithName) && specialty.getName().equals(expectedSpecialtyWithName.getName()))))
+                .thenReturn(Optional.of(expectedAfterSave));
 
-//    @Test
-//    void shouldUpdateSpecialty() {
-//
-//        when(repository.existsById(expectedSpecialtyWithIdName.getId())).thenReturn(true);
-//        when(repository.update(argThat(specialty -> specialty.getId().equals(expectedSpecialtyWithIdName.getId()) && specialty.getName().equals(expectedSpecialtyWithIdName.getName()))))
-//                .thenReturn(expectedSpecialtyWithIdName);
-//
-//        Specialty updatedSpecialty = service.update(expectedSpecialtyWithIdName);
-//
-//        assertNotNull(updatedSpecialty);
-//        assertEquals(expectedSpecialtyWithIdName, updatedSpecialty);
-//
-//        verify(repository, atLeastOnce()).existsById(expectedSpecialtyWithIdName.getId());
-//        verify(repository, atLeastOnce()).update(argThat(specialty -> specialty.getId().equals(expectedSpecialtyWithIdName.getId()) && specialty.getName().equals(expectedSpecialtyWithIdName.getName())));
-//    }
+        Specialty savedSpecialty = service.save(expectedSpecialtyWithName);
+
+        assertNotNull(savedSpecialty);
+        assertEquals(expectedSpecialtyWithName, savedSpecialty);
+        assertEquals(1, savedSpecialty.getId());
+
+        verify(repository, atLeastOnce())
+                .save(argThat(specialty -> specialty.equals(expectedSpecialtyWithName) && specialty.getName().equals(expectedSpecialtyWithName.getName())));
+    }
+
+    @Test
+    void shouldUpdateSpecialty() {
+
+        when(repository.findById(expectedSpecialtyWithIdName.getId())).thenReturn(Optional.ofNullable(expectedSpecialtyWithIdName));
+        when(repository.update(argThat(specialty -> specialty.getId().equals(expectedSpecialtyWithIdName.getId()) && specialty.getName().equals(expectedSpecialtyWithIdName.getName()))))
+                .thenReturn(Optional.ofNullable(expectedSpecialtyWithIdName));
+
+        Specialty updatedSpecialty = service.update(expectedSpecialtyWithIdName);
+
+        assertNotNull(updatedSpecialty);
+        assertEquals(expectedSpecialtyWithIdName, updatedSpecialty);
+
+        verify(repository, atLeastOnce()).findById(expectedSpecialtyWithIdName.getId());
+        verify(repository, atLeastOnce()).update(argThat(specialty -> specialty.getId().equals(expectedSpecialtyWithIdName.getId()) && specialty.getName().equals(expectedSpecialtyWithIdName.getName())));
+    }
 
     @Test
     void shouldThrowNotFoundExceptionWhenUpdateSpecialty() {
 
-        when(repository.existsById(expectedSpecialtyWithIdName.getId())).thenReturn(false);
+        when(repository.findById(expectedSpecialtyWithIdName.getId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> service.update(expectedSpecialtyWithIdName));
 
-        verify(repository, times(1)).existsById(expectedSpecialtyWithIdName.getId());
+        verify(repository, times(1)).findById(expectedSpecialtyWithIdName.getId());
         verify(repository, never()).update(expectedSpecialtyWithIdName);
 
         verifyNoMoreInteractions(repository);
@@ -101,44 +104,22 @@ class SpecialtyServiceImplTest {
     }
 
     @Test
-    void shouldReturnTrueIfSpecialtyExistsWhenExistsById() {
-        when(repository.existsById(expectedSpecialtyWithIdName.getId())).thenReturn(true);
+    void findAllSpecialties() {
+        when(repository.findAll()).thenReturn(Optional.of(getExpectedSpecialties()));
 
-        boolean existsSpecialty = service.existsById(expectedSpecialtyWithIdName.getId());
+        List<Specialty> allFoundSpecialties = service.findAll();
 
-        assertTrue(existsSpecialty);
+        assertNotNull(allFoundSpecialties);
+        assertFalse(allFoundSpecialties.isEmpty());
+        assertEquals(getExpectedSpecialties(), allFoundSpecialties);
+        assertEquals(2, allFoundSpecialties.size());
 
-        verify(repository, times(1)).existsById(expectedSpecialtyWithIdName.getId());
+        verify(repository, times(1)).findAll();
     }
-
-    @Test
-    void shouldReturnFalseIfSpecialtyDoesNotExistsWhenExistsById() {
-        when(repository.existsById(expectedSpecialtyWithIdName.getId())).thenReturn(false);
-
-        boolean existsSpecialty = service.existsById(expectedSpecialtyWithIdName.getId());
-
-        assertFalse(existsSpecialty);
-
-        verify(repository, times(1)).existsById(expectedSpecialtyWithIdName.getId());
-    }
-
-//    @Test
-//    void findAllSpecialties() {
-//        when(repository.findAll()).thenReturn(getExpectedSpecialties());
-//
-//        List<Specialty> allFoundSpecialties = service.findAll();
-//
-//        assertNotNull(allFoundSpecialties);
-//        assertFalse(allFoundSpecialties.isEmpty());
-//        assertEquals(getExpectedSpecialties(), allFoundSpecialties);
-//        assertEquals(2, allFoundSpecialties.size());
-//
-//        verify(repository, times(1)).findAll();
-//    }
 
     @Test
     void shouldDeleteByIdSpecialty() {
-        when(repository.existsById(expectedSpecialtyWithIdName.getId())).thenReturn(true);
+        when(repository.findById(expectedSpecialtyWithIdName.getId())).thenReturn(Optional.ofNullable(expectedSpecialtyWithIdName));
         doNothing().when(repository).deleteById(expectedSpecialtyWithIdName.getId());
 
         service.deleteById(expectedSpecialtyWithIdName.getId());
@@ -150,11 +131,11 @@ class SpecialtyServiceImplTest {
     void shouldThrowNotFoundExceptionWhenDeleteByIdSpecialty() {
         Integer deleteBySpecialtyId = expectedSpecialtyWithIdName.getId();
 
-        when(repository.existsById(deleteBySpecialtyId)).thenReturn(false);
+        when(repository.findById(deleteBySpecialtyId)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> service.deleteById(deleteBySpecialtyId));
 
-        verify(repository, times(1)).existsById(expectedSpecialtyWithIdName.getId());
+        verify(repository, times(1)).findById(expectedSpecialtyWithIdName.getId());
         verify(repository, never()).deleteById(expectedSpecialtyWithIdName.getId());
     }
 
@@ -173,7 +154,7 @@ class SpecialtyServiceImplTest {
     }
 
     private Specialty getExpectedSpecialtyWithIdName() {
-        return new Specialty(1, "any");
+        return new Specialty(1, "any", Status.ACTIVE);
     }
 
     private NotFoundException getNotFoundException() {

@@ -9,12 +9,13 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static com.sasha.jdbccrud.util.ConnectionUtil.getConnection;
 import static com.sasha.jdbccrud.util.constant.Constants.CHANGELOG_FILE;
 
 public class LiquibaseMigration {
+    private static final ConnectionUtil connectionUtil = ConnectionUtil.getInstance();
+    private LiquibaseMigration() {}
     public static void migrate(){
-        try (Connection connection = getConnection();
+        try (Connection connection = connectionUtil.getConnection();
         Liquibase liquibase = new Liquibase(CHANGELOG_FILE, new ClassLoaderResourceAccessor(), new JdbcConnection(connection))){
             liquibase.validate();
             liquibase.update("");

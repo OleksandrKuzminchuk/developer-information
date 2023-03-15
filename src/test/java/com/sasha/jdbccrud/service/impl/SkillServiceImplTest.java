@@ -41,44 +41,47 @@ class SkillServiceImplTest {
         Mockito.reset(repository);
     }
 
-//    @Test
-//    void shouldSaveSkill() {
-//        when(repository.save(argThat(skill -> skill.equals(expectedSkillWithName) && skill.getName().equals(expectedSkillWithName.getName()))))
-//                .thenReturn(expectedSkillWithName);
-//
-//        Skill savedSkill = service.save(expectedSkillWithName);
-//
-//        assertNotNull(savedSkill);
-//        assertEquals(expectedSkillWithName, savedSkill);
-//
-//        verify(repository, atLeastOnce())
-//                .save(argThat(skill -> skill.equals(expectedSkillWithName) && skill.getName().equals(expectedSkillWithName.getName())));
-//    }
+    @Test
+    void shouldSaveSkill() {
+        Skill expectedAfterSave = expectedSkillWithName;
+        expectedAfterSave.setId(1);
+        when(repository.save(argThat(skill -> skill.equals(expectedSkillWithName) && skill.getName().equals(expectedSkillWithName.getName()))))
+                .thenReturn(Optional.of(expectedAfterSave));
 
-//    @Test
-//    void shouldUpdateSkill() {
-//
-//        when(repository.existsById(expectedSkillWithIdName.getId())).thenReturn(true);
-//        when(repository.update(argThat(skill -> skill.getId().equals(expectedSkillWithIdName.getId()) && skill.getName().equals(expectedSkillWithIdName.getName()))))
-//                .thenReturn(expectedSkillWithIdName);
-//
-//        Skill updatedSkill = service.update(expectedSkillWithIdName);
-//
-//        assertNotNull(updatedSkill);
-//        assertEquals(expectedSkillWithIdName, updatedSkill);
-//
-//        verify(repository, atLeastOnce()).existsById(expectedSkillWithIdName.getId());
-//        verify(repository, atLeastOnce()).update(argThat(skill -> skill.getId().equals(expectedSkillWithIdName.getId()) && skill.getName().equals(expectedSkillWithIdName.getName())));
-//    }
+        Skill savedSkill = service.save(expectedSkillWithName);
+
+        assertNotNull(savedSkill);
+        assertEquals(expectedSkillWithName, savedSkill);
+        assertEquals(1, savedSkill.getId());
+
+        verify(repository, atLeastOnce())
+                .save(argThat(skill -> skill.equals(expectedSkillWithName) && skill.getName().equals(expectedSkillWithName.getName())));
+    }
+
+    @Test
+    void shouldUpdateSkill() {
+
+        when(repository.findById(expectedSkillWithIdName.getId())).thenReturn(Optional.ofNullable(expectedSkillWithIdName));
+        when(repository.update(argThat(skill -> skill.getId().equals(expectedSkillWithIdName.getId()) && skill.getName().equals(expectedSkillWithIdName.getName()))))
+                .thenReturn(Optional.ofNullable(expectedSkillWithIdName));
+
+        Skill updatedSkill = service.update(expectedSkillWithIdName);
+
+        assertNotNull(updatedSkill);
+        assertEquals(expectedSkillWithIdName, updatedSkill);
+
+        verify(repository, atLeastOnce()).findById(expectedSkillWithIdName.getId());
+        verify(repository, atLeastOnce()).update(argThat(skill -> skill.getId().equals(expectedSkillWithIdName.getId()) && skill.getName().equals(expectedSkillWithIdName.getName())));
+    }
 
     @Test
     void shouldThrowNotFoundExceptionWhenUpdateSkill() {
 
-        when(repository.existsById(expectedSkillWithIdName.getId())).thenReturn(false);
+        when(repository.findById(expectedSkillWithIdName.getId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> service.update(expectedSkillWithIdName));
 
-        verify(repository, times(1)).existsById(expectedSkillWithIdName.getId());
+        verify(repository, times(1)).findById(expectedSkillWithIdName.getId());
         verify(repository, never()).update(expectedSkillWithIdName);
 
         verifyNoMoreInteractions(repository);
@@ -106,44 +109,22 @@ class SkillServiceImplTest {
     }
 
     @Test
-    void shouldReturnTrueIfSkillExistsWhenExistsById() {
-        when(repository.existsById(expectedSkillWithIdName.getId())).thenReturn(true);
+    void findAllSkills() {
+        when(repository.findAll()).thenReturn(Optional.of(getExpectedSkills()));
 
-        boolean existsSpecialty = service.existsById(expectedSkillWithIdName.getId());
+        List<Skill> allFoundSkills = service.findAll();
 
-        assertTrue(existsSpecialty);
+        assertNotNull(allFoundSkills);
+        assertFalse(allFoundSkills.isEmpty());
+        assertEquals(getExpectedSkills(), allFoundSkills);
+        assertEquals(2, allFoundSkills.size());
 
-        verify(repository, times(1)).existsById(expectedSkillWithIdName.getId());
+        verify(repository, times(1)).findAll();
     }
-
-    @Test
-    void shouldReturnFalseIfSkillDoesNotExistsWhenExistsById() {
-        when(repository.existsById(expectedSkillWithIdName.getId())).thenReturn(false);
-
-        boolean existsSpecialty = service.existsById(expectedSkillWithIdName.getId());
-
-        assertFalse(existsSpecialty);
-
-        verify(repository, times(1)).existsById(expectedSkillWithIdName.getId());
-    }
-
-//    @Test
-//    void findAllSkills() {
-//        when(repository.findAll()).thenReturn(getExpectedSkills());
-//
-//        List<Skill> allFoundSkills = service.findAll();
-//
-//        assertNotNull(allFoundSkills);
-//        assertFalse(allFoundSkills.isEmpty());
-//        assertEquals(getExpectedSkills(), allFoundSkills);
-//        assertEquals(2, allFoundSkills.size());
-//
-//        verify(repository, times(1)).findAll();
-//    }
 
     @Test
     void shouldDeleteByIdSkill() {
-        when(repository.existsById(expectedSkillWithIdName.getId())).thenReturn(true);
+        when(repository.findById(expectedSkillWithIdName.getId())).thenReturn(Optional.ofNullable(expectedSkillWithIdName));
         doNothing().when(repository).deleteById(expectedSkillWithIdName.getId());
 
         service.deleteById(expectedSkillWithIdName.getId());
@@ -155,11 +136,11 @@ class SkillServiceImplTest {
     void shouldThrowNotFoundExceptionWhenDeleteByIdSkill() {
         Integer deleteBySkillId = expectedSkillWithIdName.getId();
 
-        when(repository.existsById(deleteBySkillId)).thenReturn(false);
+        when(repository.findById(deleteBySkillId)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> service.deleteById(deleteBySkillId));
 
-        verify(repository, times(1)).existsById(expectedSkillWithIdName.getId());
+        verify(repository, times(1)).findById(expectedSkillWithIdName.getId());
         verify(repository, never()).deleteById(expectedSkillWithIdName.getId());
     }
 
@@ -177,7 +158,7 @@ class SkillServiceImplTest {
     }
 
     private Skill getExpectedSkillWithIdName() {
-        return new Skill(1, "any");
+        return new Skill(1, "any", Status.ACTIVE);
     }
 
     private NotFoundException getNotFoundException() {

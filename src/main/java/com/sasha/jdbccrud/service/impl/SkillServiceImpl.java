@@ -2,7 +2,7 @@ package com.sasha.jdbccrud.service.impl;
 
 import com.sasha.jdbccrud.exception.NotFoundException;
 import com.sasha.jdbccrud.model.Skill;
-import org.apache.commons.lang3.NotImplementedException;
+import com.sasha.jdbccrud.model.Status;
 import com.sasha.jdbccrud.repository.SkillRepository;
 import com.sasha.jdbccrud.service.SkillService;
 
@@ -22,11 +22,6 @@ public class SkillServiceImpl implements SkillService {
     }
 
     @Override
-    public void saveAll(List<Skill> entities) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public Skill update(Skill skill) {
         isExistsSkill(skill.getId());
         return repository.update(skill).orElseThrow(() -> new NotFoundException(FAILED_TO_UPDATE_SKILL_BY_ID));
@@ -35,11 +30,6 @@ public class SkillServiceImpl implements SkillService {
     @Override
     public Skill findById(Integer id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_SKILL));
-    }
-
-    @Override
-    public boolean existsById(Integer id) {
-        return repository.existsById(id);
     }
 
     @Override
@@ -54,17 +44,13 @@ public class SkillServiceImpl implements SkillService {
     }
 
     @Override
-    public void delete(Skill skill) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void deleteAll() {
         repository.deleteAll();
     }
 
     protected void isExistsSkill(Integer id){
-        if (!existsById(id))
+        if(!findById(id).getStatus().equals(Status.ACTIVE)){
             throw new NotFoundException(NOT_FOUND_SKILL);
+        }
     }
 }

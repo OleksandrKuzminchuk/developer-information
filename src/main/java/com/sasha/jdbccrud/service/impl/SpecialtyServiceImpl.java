@@ -2,7 +2,7 @@ package com.sasha.jdbccrud.service.impl;
 
 import com.sasha.jdbccrud.exception.NotFoundException;
 import com.sasha.jdbccrud.model.Specialty;
-import org.apache.commons.lang3.NotImplementedException;
+import com.sasha.jdbccrud.model.Status;
 import com.sasha.jdbccrud.repository.SpecialtyRepository;
 import com.sasha.jdbccrud.service.SpecialtyService;
 
@@ -22,11 +22,6 @@ public class SpecialtyServiceImpl implements SpecialtyService {
     }
 
     @Override
-    public void saveAll(List<Specialty> specialities) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public Specialty update(Specialty specialty) {
         isExistsSpecialty(specialty.getId());
         return repository.update(specialty).orElseThrow(() -> new NotFoundException(FAILED_TO_UPDATE_A_SPECIALTY_BY_ID));
@@ -35,11 +30,6 @@ public class SpecialtyServiceImpl implements SpecialtyService {
     @Override
     public Specialty findById(Integer id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_SPECIALITY));
-    }
-
-    @Override
-    public boolean existsById(Integer id) {
-        return repository.existsById(id);
     }
 
     @Override
@@ -54,17 +44,13 @@ public class SpecialtyServiceImpl implements SpecialtyService {
     }
 
     @Override
-    public void delete(Specialty specialty) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void deleteAll() {
         repository.deleteAll();
     }
 
     protected void isExistsSpecialty(Integer id){
-        if (!existsById(id))
+        if(!findById(id).getStatus().equals(Status.ACTIVE)){
             throw new NotFoundException(NOT_FOUND_SPECIALITY);
+        }
     }
 }

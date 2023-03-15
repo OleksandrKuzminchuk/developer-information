@@ -4,8 +4,6 @@ public final class SqlConstantsSkill {
     private SqlConstantsSkill() {
         throw new IllegalStateException("Utility class");
     }
-
-    public static final String EXISTS_BY_ID_SKILL = "SELECT COUNT(*) as count FROM skill WHERE id = ? AND status = 'ACTIVE'";
     public static final String SAVE_SKILL = "INSERT INTO skill (name, status) VALUES (?, 'ACTIVE')";
     public static final String UPDATE_SKILL = "UPDATE skill SET name = ? WHERE id = ?";
     public static final String FIND_ALL_SKILLS = "SELECT * FROM skill WHERE status = 'ACTIVE'";

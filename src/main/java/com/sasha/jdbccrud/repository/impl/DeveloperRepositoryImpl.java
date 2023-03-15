@@ -4,32 +4,27 @@ import com.sasha.jdbccrud.model.Developer;
 import com.sasha.jdbccrud.model.Skill;
 import com.sasha.jdbccrud.model.Specialty;
 import com.sasha.jdbccrud.model.Status;
-import org.apache.commons.lang3.NotImplementedException;
+import com.sasha.jdbccrud.util.ConnectionUtil;
 import com.sasha.jdbccrud.repository.DeveloperRepository;
 
 import java.sql.*;
 import java.util.*;
 
-import static com.sasha.jdbccrud.util.ConnectionUtil.getConnection;
-import static com.sasha.jdbccrud.util.ConnectionUtil.getPreparedStatement;
 import static java.lang.String.format;
 import static com.sasha.jdbccrud.util.constant.Constants.*;
 import static com.sasha.jdbccrud.util.constant.SqlConstantsDeveloper.*;
 
 public class DeveloperRepositoryImpl implements DeveloperRepository {
+    private ConnectionUtil connectionUtil = ConnectionUtil.getInstance();
     @Override
     public Optional<Developer> save(Developer developer) {
-        String SQL_QUERY = getSqlQueryIfSpecialtyNullOrNotNull(developer, SAVE);
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(SQL_QUERY, Statement.RETURN_GENERATED_KEYS)) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement statement = connectionUtil.getPreparedStatementWithGeneratedKey(SAVE_DEVELOPER, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, developer.getFirstName());
             statement.setString(2, developer.getLastName());
-            setSpecialtyIfNotNull(developer, statement);
+            statement.setObject(3, developer.getSpecialty() == null ? null : developer.getSpecialty().getId(), Types.INTEGER);
             statement.executeUpdate();
             generateKey(developer, statement);
-            addSkillIfSkillsListNotNull(developer, connection);
-            connection.commit();
+            processDevelopersSkills(developer);
         } catch (SQLException e) {
             System.out.println(FAILED_TO_SAVE_DEVELOPER + e);
             return Optional.empty();
@@ -38,24 +33,13 @@ public class DeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public void saveAll(List<Developer> developers) {
-        throw new NotImplementedException();
-    }
-
-    //TODO: Help me
-    @Override
     public Optional<Developer> update(Developer developer) {
-        String SQL_QUERY = getSqlQueryIfSpecialtyNullOrNotNull(developer, UPDATE);
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(SQL_QUERY)) {
-            connection.setAutoCommit(false);
+        try (PreparedStatement statement = connectionUtil.getPreparedStatement(UPDATE_DEVELOPER)) {
             statement.setString(1, developer.getFirstName());
             statement.setString(2, developer.getLastName());
-            setSpecialtyIfNotNull(developer, statement);
             setDeveloperIdIfSpecialtyNullOrNotNull(developer, statement);
             statement.executeUpdate();
-            addSkillIfSkillsListNotNull(developer, connection);
-            connection.commit();
+            processDevelopersSkills(developer);
         } catch (SQLException e) {
             System.out.println(FAILED_TO_UPDATE_DEVELOPER + e);
             return Optional.empty();
@@ -66,7 +50,7 @@ public class DeveloperRepositoryImpl implements DeveloperRepository {
     @Override
     public Optional<Developer> findById(Integer id) {
         Developer result;
-        try (PreparedStatement statement = getPreparedStatement(FIND_BY_ID_DEVELOPER, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+        try (PreparedStatement statement = connectionUtil.getPreparedStatementWithResultSetType(FIND_BY_ID_DEVELOPER, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 result = resultSet.next() ? mapResultSetToDeveloper(resultSet) : null;
@@ -79,25 +63,9 @@ public class DeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public boolean existsById(Integer id) {
-        try (PreparedStatement statement = getPreparedStatement(EXISTS_DEVELOPER)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    int count = resultSet.getInt("count");
-                    return count > 0;
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println(format(FAILED_TO_CHECK_IF_DEVELOPER_EXISTS_BY_ID, id) + e);
-        }
-        return false;
-    }
-
-    @Override
     public Optional<List<Developer>> findAll() {
         List<Developer> developers = new LinkedList<>();
-        try (PreparedStatement statement = getPreparedStatement(FIND_ALL_DEVELOPERS, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+        try (PreparedStatement statement = connectionUtil.getPreparedStatementWithResultSetType(FIND_ALL_DEVELOPERS, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     developers.add(mapResultSetToDeveloper(resultSet));
@@ -112,7 +80,7 @@ public class DeveloperRepositoryImpl implements DeveloperRepository {
 
     @Override
     public void deleteById(Integer id) {
-        try (PreparedStatement statement = getPreparedStatement(DELETE_BY_ID_DEVELOPER)) {
+        try (PreparedStatement statement = connectionUtil.getPreparedStatement(DELETE_BY_ID_DEVELOPER)) {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -121,61 +89,32 @@ public class DeveloperRepositoryImpl implements DeveloperRepository {
     }
 
     @Override
-    public void delete(Developer entity) {
-        throw new NotImplementedException();
-    }
-
-    @Override
     public void deleteAll() {
-        try (PreparedStatement statement = getPreparedStatement(DELETE_ALL_DEVELOPERS)) {
+        try (PreparedStatement statement = connectionUtil.getPreparedStatement(DELETE_ALL_DEVELOPERS)) {
             statement.executeUpdate();
         } catch (SQLException e) {
             System.out.println(FAILED_TO_DELETE_ALL_DEVELOPERS + e);
         }
     }
 
-    private void addSkill(Integer developerId, Integer skillId, Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(ADD_SKILL)) {
-            statement.setInt(1, developerId);
-            statement.setInt(2, skillId);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(format(FAILED_TO_ADD_SKILL_BY_ID, skillId, developerId) + e);
-        }
-    }
-
-    private void deleteSkill(Integer developerId, Integer skillId, Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(DELETE_BY_ID_SKILL_FROM_DEVELOPER)) {
-            statement.setInt(1, developerId);
-            statement.setInt(2, skillId);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(format(FAILED_TO_DELETE_SKILL_FROM_DEVELOPER, skillId, developerId) + e);
-        }
-    }
-
-    private void addSpecialty(Integer developerId, Integer specialityId, Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(ADD_SPECIALTY)) {
-            statement.setInt(1, specialityId);
-            statement.setInt(2, developerId);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(format(FAILED_TO_ADD_SPECIALTY_BY_ID, specialityId, developerId) + e);
-        }
-    }
-
-    private void deleteSpecialty(Integer developerId, Connection connection) {
-        try (PreparedStatement statement = connection.prepareStatement(DELETE_SPECIALTY)) {
-            statement.setInt(1, developerId);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println(format(FAILED_TO_DELETE_SPECIALTY_FROM_DEVELOPER_BY_ID, developerId) + e);
+    private void processDevelopersSkills(Developer developer) {
+        if (developer.getSkills() != null) {
+            try (PreparedStatement statement = connectionUtil.getPreparedStatement(ADD_SKILL)) {
+                for (Skill skill : developer.getSkills()) {
+                    statement.setInt(1, developer.getId());
+                    statement.setInt(2, skill.getId());
+                    statement.addBatch();
+                }
+                statement.executeBatch();
+            } catch (SQLException e) {
+                System.out.println(FAILED_TO_ADD_SKILL_BY_ID + e);
+            }
         }
     }
 
     private Developer mapResultSetToDeveloper(ResultSet resultSet) throws SQLException {
         Developer developer = new Developer(
-                resultSet.getInt("dev.id"),
+                resultSet.getInt(1),
                 resultSet.getString("dev.first_name"),
                 resultSet.getString("dev.last_name"),
                 Status.valueOf(resultSet.getString("dev.status")));
@@ -207,46 +146,16 @@ public class DeveloperRepositoryImpl implements DeveloperRepository {
         return developer;
     }
 
-    private static String getSqlQueryIfSpecialtyNullOrNotNull(Developer developer, String methodName) {
-        String SQL_QUERY;
-        switch (methodName) {
-            case "save" -> {
-                if (developer.getSpecialty() == null) {
-                    SQL_QUERY = SAVE_DEVELOPER;
-                } else {
-                    SQL_QUERY = SAVE_DEVELOPER_WITH_SPECIALTY;
-                }
-                return SQL_QUERY;
-            }
-            case "update" -> {
-                if (developer.getSpecialty() == null) {
-                    SQL_QUERY = UPDATE_DEVELOPER;
-                } else {
-                    SQL_QUERY = UPDATE_DEVELOPER_WITH_SPECIALTY;
-                }
-                return SQL_QUERY;
-            }
-            default -> throw new NotImplementedException("No correct the methodName");
-        }
-    }
-
-    private static void setSpecialtyIfNotNull(Developer developer, PreparedStatement statement) throws SQLException {
-        if (developer.getSpecialty() != null) {
-            statement.setInt(3, developer.getSpecialty().getId());
-        }
-    }
     private static void setDeveloperIdIfSpecialtyNullOrNotNull(Developer developer, PreparedStatement statement) throws SQLException {
         if (developer.getSpecialty() == null) {
-            statement.setInt(3, developer.getId());
-        }else {
+            statement.setObject(3, null, Types.INTEGER);
+            statement.setInt(4, developer.getId());
+        } else {
+            statement.setInt(3, developer.getSpecialty().getId());
             statement.setInt(4, developer.getId());
         }
     }
-    private void addSkillIfSkillsListNotNull(Developer developer, Connection connection) {
-        if (developer.getSkills() != null) {
-            developer.getSkills().forEach(skill -> addSkill(developer.getId(), skill.getId(), connection));
-        }
-    }
+
     private static void generateKey(Developer developer, PreparedStatement statement) throws SQLException {
         ResultSet generatedKey = statement.getGeneratedKeys();
         if (generatedKey.next()) {

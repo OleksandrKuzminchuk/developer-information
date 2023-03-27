@@ -13,24 +13,17 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <com.google.code.gson.version>2.10.1</com.google.code.gson.version>
         <org.apache.commons.version>3.12.0</org.apache.commons.version>
         <com.mysql.version>8.0.32</com.mysql.version>
-        <org.liquibase.version>4.19.1</org.liquibase.version>
-        <liquibase-maven-plugin.version>4.5.0</liquibase-maven-plugin.version>
         <org.mockito.junit.version>4.5.1</org.mockito.junit.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
+        <org.hibernate>6.1.7.Final</org.hibernate>
+        <org.flywaydb>9.16.0</org.flywaydb>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${com.google.code.gson.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -41,12 +34,6 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>${com.mysql.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${org.liquibase.version}</version>
         </dependency>
 
         <dependency>
@@ -69,6 +56,18 @@
             <version>${org.mockito.junit.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${org.hibernate}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>${org.flywaydb}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -76,19 +75,6 @@
         <testSourceDirectory>src</testSourceDirectory>
 
         <plugins>
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>${liquibase-maven-plugin.version}</version>
-                <configuration>
-                    <changeLogFile>changelog.xml</changeLogFile>
-                    <driver>com.mysql.cj.jdbc.Driver</driver>
-                    <url>jdbc:mysql://localhost:3306/my_db?useSSL=false&amp;innodb_lock_wait_timeout=300</url>
-                    <username>user</username>
-                    <password>1234</password>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
